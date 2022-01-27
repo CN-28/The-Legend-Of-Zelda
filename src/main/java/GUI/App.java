@@ -1,64 +1,36 @@
 package GUI;
 
-import MapsElements.AbstractMap;
-import MapsElements.Hero;
+import MapsElements.*;
+
 import static MapsElements.MoveDirection.*;
 
-import MapsElements.MoveDirection;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 
 public class App extends Application {
-    protected static Image grassTile;
-    static int size = 30;
-
-    static {
-        try {
-            grassTile = new Image(new FileInputStream("src/main/resources/grassTile.png"), size, size, false, false);
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-        }
-    }
+    protected static AbstractMap map = new StartingMap();
+    protected static final Hero hero = new Hero();
+    protected static final Group root = new Group();
 
     public void start(Stage primaryStage) {
         primaryStage.setTitle("The Legend of Zelda");
 
-        Hero hero = new Hero();
-        GridPane grid = new GridPane();
-        int height = AbstractMap.height;
-        int width = AbstractMap.width;
+        map.nodes[hero.getY()][hero.getX()].getChildren().add(hero.getPicture());
+        root.getChildren().add(map.grid);
 
-        Group[][] gridNodes = new Group[height][width];
-
-        for (int i = 0; i < height; i++){
-            for (int j = 0; j < width; j++){
-                gridNodes[i][j] = new Group();
-                gridNodes[i][j].getChildren().addAll(new ImageView(grassTile));
-                grid.add(gridNodes[i][j], j, i);
-            }
-        }
-
-        gridNodes[hero.getY()][hero.getX()].getChildren().add(hero.getPicture());
-
-        Scene scene = new Scene(grid);
+        Scene scene = new Scene(root);
         primaryStage.setScene(scene);
 
         scene.setOnKeyPressed(ke -> {
             switch (ke.getCode()){
-                case A -> moveHero(hero, WEST, gridNodes);
-                case D -> moveHero(hero, EAST, gridNodes);
-                case S -> moveHero(hero, SOUTH, gridNodes);
-                case W -> moveHero(hero, NORTH, gridNodes);
+                case A -> moveHero(hero, WEST, map.nodes);
+                case D -> moveHero(hero, EAST, map.nodes);
+                case S -> moveHero(hero, SOUTH, map.nodes);
+                case W -> moveHero(hero, NORTH, map.nodes);
             }
             ke.consume();
         });

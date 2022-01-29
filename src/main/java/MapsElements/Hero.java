@@ -12,7 +12,7 @@ public class Hero {
     private MoveDirection orientation;
 
     private static final HashMap<MoveDirection, ImageView> imageViews = new HashMap<>();
-    private static final int size = 30;
+    private static final int size = 35;
 
     static {
         try {
@@ -30,10 +30,10 @@ public class Hero {
         this.orientation = SOUTH;
     }
 
-    public void move(MoveDirection direction){
+    public void move(AbstractMap map, MoveDirection direction){
         if (direction == this.orientation){
             Vector2d newPos = this.position.add(this.orientation.toUnitVector());
-            if (AbstractMap.canMoveTo(newPos))
+            if (map.canMoveTo(newPos))
                 this.position = newPos;
         }
         else
@@ -42,6 +42,19 @@ public class Hero {
 
     public Vector2d getPosition() {
         return this.position;
+    }
+
+    public void setPosition(int x, int y) {
+        this.position = new Vector2d(x, y);
+    }
+
+    public void setPositionAfterMapChange() {
+        int x = this.getX();
+        int y = this.getY();
+        if (x == 0 || x == AbstractMap.width - 1)
+            this.setPosition((AbstractMap.width - x - 1) % AbstractMap.width, y);
+        else if (y == 0 || y == AbstractMap.height - 1)
+            this.setPosition(x, (AbstractMap.height - y - 1) % AbstractMap.height);
     }
 
     public int getX(){

@@ -11,15 +11,17 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 
-public class App extends Application {
+public class App extends Application implements IMapChangeObserver {
     protected static AbstractMap map = new StartingMap();
     protected static final Hero hero = new Hero();
     protected static final Group root = new Group();
+    static {AbstractMap.getMapsReferences(map);}
 
     public void start(Stage primaryStage) {
+        AbstractMap.addObserver(this);
         primaryStage.setTitle("The Legend of Zelda");
 
-        map.nodes[hero.getY()][hero.getX()].getChildren().add(hero.getPicture());
+        this.renderHeroPic();
         root.getChildren().add(map.grid);
 
         Scene scene = new Scene(root);
@@ -27,10 +29,10 @@ public class App extends Application {
 
         scene.setOnKeyPressed(ke -> {
             switch (ke.getCode()){
-                case A -> moveHero(hero, WEST, map.nodes);
-                case D -> moveHero(hero, EAST, map.nodes);
-                case S -> moveHero(hero, SOUTH, map.nodes);
-                case W -> moveHero(hero, NORTH, map.nodes);
+                case A -> moveHero(hero, WEST);
+                case D -> moveHero(hero, EAST);
+                case S -> moveHero(hero, SOUTH);
+                case W -> moveHero(hero, NORTH);
             }
             ke.consume();
         });
@@ -48,9 +50,24 @@ public class App extends Application {
         launch(args);
     }
 
-    public void moveHero(Hero hero, MoveDirection direction, Group[][] gridNodes){
-        gridNodes[hero.getY()][hero.getX()].getChildren().remove(hero.getPicture());
-        hero.move(direction);
-        gridNodes[hero.getY()][hero.getX()].getChildren().add(hero.getPicture());
+    public void moveHero(Hero hero, MoveDirection direction){
+        this.removeHeroPic();
+        hero.move(map, direction);
+        this.renderHeroPic();
+    }
+
+    public void renderHeroPic(){
+        map.nodes[hero.getY()][hero.getX()].getChildren().add(hero.getPicture());
+    }
+
+    public void removeHeroPic(){
+        map.nodes[hero.getY()][hero.getX()].getChildren().remove(hero.getPicture());
+    }
+
+    public void notifyMapChange(AbstractMap newMap){
+        root.getChildren().clear();
+        map = newMap;
+        root.getChildren().add(map.grid);
+        hero.setPositionAfterMapChange();
     }
 }

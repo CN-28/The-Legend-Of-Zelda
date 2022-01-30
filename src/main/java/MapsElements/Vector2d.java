@@ -1,8 +1,8 @@
 package MapsElements;
 
 public class Vector2d {
-    public int x;
-    public int y;
+    private final int x;
+    private final int y;
 
     public Vector2d(final int x, final int y){
         this.x = x;
@@ -23,6 +23,14 @@ public class Vector2d {
 
     public Vector2d add(Vector2d other){
         return new Vector2d(this.x + other.x, this.y + other.y);
+    }
+
+    public int getX(){
+        return this.x;
+    }
+
+    public int getY(){
+        return this.y;
     }
 
     public boolean equals(Object other){

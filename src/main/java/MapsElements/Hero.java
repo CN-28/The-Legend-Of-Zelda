@@ -10,16 +10,48 @@ import static MapsElements.MoveDirection.*;
 public class Hero {
     private Vector2d position;
     private MoveDirection orientation;
-
-    private static final HashMap<MoveDirection, ImageView> imageViews = new HashMap<>();
+    private static final HashMap<MoveDirection, ImageView[]> attackImageViews = new HashMap<>();
+    private static final HashMap<MoveDirection, ImageView> basicImageViews = new HashMap<>();
     private static final int size = 35;
-
     static {
+        attackImageViews.put(SOUTH, new ImageView[8]);
+        attackImageViews.put(EAST, new ImageView[8]);
+        attackImageViews.put(WEST, new ImageView[8]);
+        attackImageViews.put(NORTH, new ImageView[8]);
         try {
-            imageViews.put(SOUTH, new ImageView(new Image(new FileInputStream("src/main/resources/frontHero.png"), size, size, false, false)));
-            imageViews.put(EAST, new ImageView(new Image(new FileInputStream("src/main/resources/rightHero.png"), size, size, false, false)));
-            imageViews.put(WEST, new ImageView(new Image(new FileInputStream("src/main/resources/leftHero.png"), size, size, false, false)));
-            imageViews.put(NORTH, new ImageView(new Image(new FileInputStream("src/main/resources/backHero.png"), size, size, false, false)));
+            basicImageViews.put(SOUTH, new ImageView(new Image(new FileInputStream("src/main/resources/frontHero.png"), size, size, false, false)));
+            basicImageViews.put(EAST, new ImageView(new Image(new FileInputStream("src/main/resources/rightHero.png"), size, size, false, false)));
+            basicImageViews.put(WEST, new ImageView(new Image(new FileInputStream("src/main/resources/leftHero.png"), size, size, false, false)));
+            basicImageViews.put(NORTH, new ImageView(new Image(new FileInputStream("src/main/resources/backHero.png"), size, size, false, false)));
+            attackImageViews.get(SOUTH)[0] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom1.png"), size, size, false, false));
+            attackImageViews.get(SOUTH)[2] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom2_1.png"), size, size, false, false));
+            attackImageViews.get(SOUTH)[3] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom2_2.png"), size, size, false, false));
+            attackImageViews.get(SOUTH)[4] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom3_1.png"), size, size, false, false));
+            attackImageViews.get(SOUTH)[5] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom3_2.png"), size, size, false, false));
+            attackImageViews.get(SOUTH)[6] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom4_1.png"), size, size, false, false));
+            attackImageViews.get(SOUTH)[7] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom4_2.png"), size, size, false, false));
+            attackImageViews.get(WEST)[0] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft1.png"), size, size, false, false));
+            attackImageViews.get(WEST)[2] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft2_1.png"), size, size, false, false));
+            attackImageViews.get(WEST)[3] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft2_2.png"), size, size, false, false));
+            attackImageViews.get(WEST)[4] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft3_1.png"), size, size, false, false));
+            attackImageViews.get(WEST)[5] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft3_2.png"), size, size, false, false));
+            attackImageViews.get(WEST)[6] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft4_1.png"), size, size, false, false));
+            attackImageViews.get(WEST)[7] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft4_2.png"), size, size, false, false));
+            attackImageViews.get(EAST)[0] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight1.png"), size, size, false, false));
+            attackImageViews.get(EAST)[2] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight2_1.png"), size, size, false, false));
+            attackImageViews.get(EAST)[3] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight2_2.png"), size, size, false, false));
+            attackImageViews.get(EAST)[4] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight3_1.png"), size, size, false, false));
+            attackImageViews.get(EAST)[5] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight3_2.png"), size, size, false, false));
+            attackImageViews.get(EAST)[6] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight4_1.png"), size, size, false, false));
+            attackImageViews.get(EAST)[7] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight4_2.png"), size, size, false, false));
+            attackImageViews.get(NORTH)[0] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp1.png"), size, size, false, false));
+            attackImageViews.get(NORTH)[2] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp2_1.png"), size, size, false, false));
+            attackImageViews.get(NORTH)[3] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp2_2.png"), size, size, false, false));
+            attackImageViews.get(NORTH)[4] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp3_1.png"), size, size, false, false));
+            attackImageViews.get(NORTH)[5] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp3_2.png"), size, size, false, false));
+            attackImageViews.get(NORTH)[6] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp4_1.png"), size, size, false, false));
+            attackImageViews.get(NORTH)[7] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp4_2.png"), size, size, false, false));
+
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }
@@ -44,6 +76,10 @@ public class Hero {
         return this.position;
     }
 
+    public MoveDirection getOrientation(){
+        return this.orientation;
+    }
+
     public void setPosition(int x, int y) {
         this.position = new Vector2d(x, y);
     }
@@ -58,14 +94,18 @@ public class Hero {
     }
 
     public int getX(){
-        return this.position.x;
+        return this.position.getX();
     }
 
     public int getY(){
-        return this.position.y;
+        return this.position.getY();
     }
 
     public ImageView getPicture(){
-        return imageViews.get(this.orientation);
+        return basicImageViews.get(this.orientation);
+    }
+
+    public ImageView[] getAnimationAttack(){
+        return attackImageViews.get(this.orientation);
     }
 }

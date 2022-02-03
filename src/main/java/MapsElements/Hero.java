@@ -7,9 +7,7 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import static MapsElements.MoveDirection.*;
 
-public class Hero {
-    private Vector2d position;
-    private MoveDirection orientation;
+public class Hero extends Creature {
     private static final HashMap<MoveDirection, ImageView[]> attackImageViews = new HashMap<>();
     private static final HashMap<MoveDirection, ImageView> basicImageViews = new HashMap<>();
     private static final int size = 35;
@@ -72,14 +70,6 @@ public class Hero {
             this.orientation = direction;
     }
 
-    public Vector2d getPosition() {
-        return this.position;
-    }
-
-    public MoveDirection getOrientation(){
-        return this.orientation;
-    }
-
     public void setPosition(int x, int y) {
         this.position = new Vector2d(x, y);
     }
@@ -91,14 +81,6 @@ public class Hero {
             this.setPosition((AbstractMap.width - x - 1) % AbstractMap.width, y);
         else if (y == 0 || y == AbstractMap.height - 1)
             this.setPosition(x, (AbstractMap.height - y - 1) % AbstractMap.height);
-    }
-
-    public int getX(){
-        return this.position.getX();
-    }
-
-    public int getY(){
-        return this.position.getY();
     }
 
     public ImageView getPicture(){

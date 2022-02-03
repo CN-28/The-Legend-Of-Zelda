@@ -13,7 +13,16 @@ public class SouthEastMap extends AbstractMap {
         for (int i = 0; i < height; i++){
             for (int j = 0; j < width; j++){
                 this.nodes[i][j] = new Group();
-                this.nodes[i][j].getChildren().addAll(new ImageView(grassTile));
+                if (i >= -j + 18 + height)
+                    this.nodes[i][j].getChildren().add(new ImageView(waterTile));
+                else if (i == -j + 17 + height && j < 24)
+                    this.nodes[i][j].getChildren().add(new ImageView(bottomRightWaterCornerTile));
+                else if (j < width - 6)
+                    this.nodes[i][j].getChildren().add(new ImageView(sandTile));
+                else if (j == width - 6 && i <= 15)
+                    this.nodes[i][j].getChildren().add(new ImageView(waterEdgeTile));
+                else
+                    this.nodes[i][j].getChildren().add(new ImageView(waterTile));
                 this.grid.add(this.nodes[i][j], j, i);
             }
         }

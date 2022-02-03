@@ -23,4 +23,13 @@ public enum MoveDirection {
             case EAST -> new Vector2d(1, 0);
         };
     }
+
+    public MoveDirection next(){
+        return switch (this) {
+            case NORTH -> EAST;
+            case EAST -> SOUTH;
+            case SOUTH -> WEST;
+            case WEST -> NORTH;
+        };
+    }
 }

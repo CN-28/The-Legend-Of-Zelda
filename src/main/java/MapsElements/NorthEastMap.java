@@ -13,6 +13,7 @@ public class NorthEastMap extends AbstractMap {
         for (int i = 0; i < height; i++){
             for (int j = 0; j < width; j++){
                 this.nodes[i][j] = new Group();
+                this.occupancyMap[i][j] = true;
                 if (i <= j - 18)
                     this.nodes[i][j].getChildren().add(new ImageView(waterTile));
                 else if (i == height - 1 && (j > 7 & j <= 12 || j >= 17 && j < 24) || j == 0 && i <= 7 || i == 0 && j <= 16)
@@ -23,9 +24,11 @@ public class NorthEastMap extends AbstractMap {
                     this.nodes[i][j].getChildren().add(new ImageView(sandBarrierTile));
                 else if (i == j - 17 && j < 24)
                     this.nodes[i][j].getChildren().add(new ImageView(upperRightWaterCornerTile));
-                else if (j < width - 6)
+                else if (j < width - 6){
                     this.nodes[i][j].getChildren().add(new ImageView(sandTile));
-                else if (j == width - 6 && i >= 7)
+                    this.occupancyMap[i][j] = false;
+                }
+                else if (j == width - 6)
                     this.nodes[i][j].getChildren().add(new ImageView(waterEdgeTile));
                 else
                     this.nodes[i][j].getChildren().add(new ImageView(waterTile));
@@ -39,8 +42,10 @@ public class NorthEastMap extends AbstractMap {
 
         if (position.follows(leftBottomPassageBorder) && position.precedes(leftUpperPassageBorder))
             MapChangeObserver.notifyMapChange(maps.get("North"));
-        else if (position.follows(bottomLeftPassageBorder) && position.precedes(bottomRightPassageBorder))
+        else if (position.follows(bottomLeftPassageBorder) && position.precedes(bottomRightPassageBorder)){
             MapChangeObserver.notifyMapChange(maps.get("East"));
+            maps.get("East").animation.start();
+        }
 
         return false;
     }

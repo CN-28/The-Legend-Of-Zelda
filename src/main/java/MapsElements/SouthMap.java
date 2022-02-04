@@ -15,10 +15,18 @@ public class SouthMap extends AbstractMap {
         for (int i = 0; i < height; i++){
             for (int j = 0; j < width; j++){
                 this.nodes[i][j] = new Group();
+                this.occupancyMap[i][j] = true;
                 if (j == width - 1 && i >= 7 && i < 13 || j == width - 2 && i >= 7 && i <= 12 || j == width - 3 && i >= 8 && i <= 11 || j == width - 4 && i >= 9 && i <= 10){
                     this.nodes[i][j].getChildren().add(new ImageView(sandTile));
-                    if (i == 7 && j == width - 1) this.nodes[i][j].getChildren().add(new ImageView(sandBarrierBottomLeftCornerTile));
-                    if (i == 12 && j == width - 1) this.nodes[i][j].getChildren().add(new ImageView(sandBarrierUpperLeftCornerTile));
+                    this.occupancyMap[i][j] = false;
+                    if (i == 7 && j == width - 1){
+                        this.nodes[i][j].getChildren().add(new ImageView(sandBarrierBottomLeftCornerTile));
+                        this.occupancyMap[i][j] = true;
+                    }
+                    if (i == 12 && j == width - 1){
+                        this.nodes[i][j].getChildren().add(new ImageView(sandBarrierUpperLeftCornerTile));
+                        this.occupancyMap[i][j] = true;
+                    }
                 }
                 else if ((j >= 8 && j <= 12 || j >= 17 && j <= 21) && i == 0 || i == height - 1 && j <= 21 || j == 0 && i >= 12){
                     this.nodes[i][j].getChildren().add(new ImageView(grassTile));
@@ -30,8 +38,10 @@ public class SouthMap extends AbstractMap {
                     this.nodes[i][j].getChildren().add(new ImageView(grassTile));
                     this.nodes[i][j].getChildren().add(new ImageView(grassBarrierBottomRightCornerTile));
                 }
-                else if ((i == 0 || i == 5) && j > 12 && j <= 16 || (i == 1 || i == 4) && j >= 12 && j <= 17 || i >= 2 && i <= 3 && j >= 11 && j <= 18)
+                else if ((i == 0 || i == 5) && j > 12 && j <= 16 || (i == 1 || i == 4) && j >= 12 && j <= 17 || i >= 2 && i <= 3 && j >= 11 && j <= 18){
                     this.nodes[i][j].getChildren().add(new ImageView(pathTile));
+                    this.occupancyMap[i][j] = false;
+                }
                 else if (i < j - 22 || i > -j + 21 + height)
                     this.nodes[i][j].getChildren().add(new ImageView(sandBarrierTile));
                 else if (i == j - 22){
@@ -42,8 +52,10 @@ public class SouthMap extends AbstractMap {
                     this.nodes[i][j].getChildren().add(new ImageView(grassTile));
                     this.nodes[i][j].getChildren().add(new ImageView(sandBarrierUpperLeftCornerTile));
                 }
-                else
+                else{
                     this.nodes[i][j].getChildren().add(new ImageView(grassTile));
+                    this.occupancyMap[i][j] = false;
+                }
                 this.grid.add(this.nodes[i][j], j, i);
             }
         }

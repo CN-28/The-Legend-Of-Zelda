@@ -12,6 +12,7 @@ public class NorthWestMap extends AbstractMap {
         for (int i = 0; i < height; i++){
             for (int j = 0; j < width; j++){
                 this.nodes[i][j] = new Group();
+                this.occupancyMap[i][j] = true;
                 if (i == -j + 21 + height)
                     this.nodes[i][j].getChildren().add(new ImageView(grayBarrierUpperLeftCornerTile));
                 else if (i > 3 * height/5 + j || i == -j + 22 + height || i == -j + 23 + height && j < width - 1 && j > width - 6)
@@ -22,8 +23,10 @@ public class NorthWestMap extends AbstractMap {
                     this.nodes[i][j].getChildren().add(new ImageView(grayBarrierUpperRightCornerTile));
                 else if (j == 0 || i == 0 || j == width - 1 || i == height - 1 && (j <= 2 * width/5 || j >= 3 * width/5 - 1))
                     this.nodes[i][j].getChildren().add(new ImageView(graySphereTile));
-                else
+                else{
                     this.nodes[i][j].getChildren().add(new ImageView(grayTile));
+                    this.occupancyMap[i][j] = false;
+                }
                 this.grid.add(this.nodes[i][j], j, i);
             }
         }
@@ -32,11 +35,17 @@ public class NorthWestMap extends AbstractMap {
 
     public void addBigTree(int i, int j){
         this.nodes[i][j].getChildren().add(new ImageView(upperLeftGrayTreeTile));
+        this.occupancyMap[i][j] = true;
         this.nodes[i + 1][j].getChildren().add(new ImageView(bottomLeftGrayTreeTile));
+        this.occupancyMap[i + 1][j] = true;
         this.nodes[i + 1][j + 1].getChildren().add(new ImageView(bottomMiddleGrayTreeTile));
+        this.occupancyMap[i + 1][j + 1] = true;
         this.nodes[i][j + 1].getChildren().add(new ImageView(upperMiddleGrayTreeTile));
+        this.occupancyMap[i][j + 1] = true;
         this.nodes[i][j + 2].getChildren().add(new ImageView(upperRightGrayTreeTile));
+        this.occupancyMap[i][j + 2] = true;
         this.nodes[i + 1][j + 2].getChildren().add(new ImageView(bottomRightGrayTreeTile));
+        this.occupancyMap[i + 1][j + 2] = true;
     }
 
     public boolean canMoveTo(Vector2d position){

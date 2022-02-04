@@ -15,9 +15,12 @@ public class StartingMap extends AbstractMap {
         for (int i = 0; i < height; i++){
             for (int j = 0; j < width; j++){
                 this.nodes[i][j] = new Group();
+                this.occupancyMap[i][j] = true;
                 if (j + 1 > 2 * width/5 + 1 && j + 1 <= 3 * width/5 - 1 || i + 1 > 2 * height/5 && i + 1 <= 3 * height/5 && j + 1 > 2 * width/5 || (j == 11 || j == 18) && i > 6 && i < 13 ||
-                    (j == 12 || j == 17) && i > 5 && i < 14 || (j == 10 || j == 19) && i > 7 && i < 12)
+                    (j == 12 || j == 17) && i > 5 && i < 14 || (j == 10 || j == 19) && i > 7 && i < 12){
                     this.nodes[i][j].getChildren().add(new ImageView(pathTile));
+                    this.occupancyMap[i][j] = false;
+                }
                 else if (j < 4)
                     this.nodes[i][j].getChildren().add(new ImageView(grassBarrierTile));
                 else if (i == 3 * height/5 + j){
@@ -44,8 +47,10 @@ public class StartingMap extends AbstractMap {
                     this.nodes[i][j].getChildren().add(new ImageView(grassTile));
                     this.nodes[i][j].getChildren().add(new ImageView(sandBarrierUpperLeftCornerTile));
                 }
-                else
+                else{
                     this.nodes[i][j].getChildren().addAll(new ImageView(grassTile));
+                    this.occupancyMap[i][j] = false;
+                }
                 this.grid.add(this.nodes[i][j], j, i);
             }
         }
@@ -55,9 +60,13 @@ public class StartingMap extends AbstractMap {
 
     public void addTree(int i, int j){
         this.nodes[i][j].getChildren().add(new ImageView(upperLeftGrassTreeTile));
+        this.occupancyMap[i][j] = true;
         this.nodes[i + 1][j].getChildren().add(new ImageView(bottomLeftGrassTreeTile));
+        this.occupancyMap[i + 1][j] = true;
         this.nodes[i][j + 1].getChildren().add(new ImageView(upperRightGrassTreeTile));
+        this.occupancyMap[i][j + 1] = true;
         this.nodes[i + 1][j + 1].getChildren().add(new ImageView(bottomRightGrassTreeTile));
+        this.occupancyMap[i + 1][j + 1] = true;
     }
 
     public void addDecoration(int i, int j){
@@ -67,6 +76,7 @@ public class StartingMap extends AbstractMap {
                     this.nodes[i + k][j + l].getChildren().add(new ImageView(grassStatueTile));
                 else
                     this.nodes[i + k][j + l].getChildren().add(new ImageView(grassSphereTile));
+                this.occupancyMap[i + k][j + l] = true;
             }
         }
     }
@@ -74,8 +84,10 @@ public class StartingMap extends AbstractMap {
     public boolean canMoveTo(Vector2d position){
         if (super.canMoveTo(position)) return true;
 
-        if (position.follows(rightBottomPassageBorder) && position.precedes(rightUpperPassageBorder))
+        if (position.follows(rightBottomPassageBorder) && position.precedes(rightUpperPassageBorder)){
             MapChangeObserver.notifyMapChange(maps.get("East"));
+            maps.get("East").animation.start();
+        }
         else if (position.follows(bottomLeftPassageBorder) && position.precedes(bottomRightPassageBorder))
             MapChangeObserver.notifyMapChange(maps.get("South"));
         else if (position.follows(upperLeftPassageBorder) && position.precedes(upperRightPassageBorder))

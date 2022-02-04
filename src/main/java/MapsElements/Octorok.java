@@ -5,6 +5,8 @@ import javafx.scene.image.ImageView;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -13,8 +15,8 @@ import static MapsElements.MoveDirection.*;
 public class Octorok extends Creature {
     private static final HashMap<MoveDirection, Image[]> images = new HashMap<>();
     private final HashMap<MoveDirection, ImageView[]> imageViews = new HashMap<>();
-    public int i = 0;
-    public int prevX, prevY;
+    public final ArrayList<MoveDirection> moveCycle = new ArrayList<>();
+    public int i, prevX, prevY;
     public ImageView prevImage;
     static {
         images.put(SOUTH, new Image[2]); images.put(EAST, new Image[2]); images.put(WEST, new Image[2]); images.put(NORTH, new Image[2]);
@@ -32,15 +34,16 @@ public class Octorok extends Creature {
         }
     }
 
-    public Octorok(int x, int y){
+    public Octorok(int x, int y, MoveDirection[] moves){
         this.position = new Vector2d(x, y);
-        this.orientation = SOUTH;
+        this.i = 0;
         this.health = 2;
         imageViews.put(SOUTH, new ImageView[2]); imageViews.put(EAST, new ImageView[2]); imageViews.put(WEST, new ImageView[2]); imageViews.put(NORTH, new ImageView[2]);
         imageViews.get(SOUTH)[0] = new ImageView(images.get(SOUTH)[0]); imageViews.get(SOUTH)[1] = new ImageView(images.get(SOUTH)[1]);
         imageViews.get(WEST)[0] = new ImageView(images.get(WEST)[0]); imageViews.get(WEST)[1] = new ImageView(images.get(WEST)[1]);
         imageViews.get(EAST)[0] = new ImageView(images.get(EAST)[0]); imageViews.get(EAST)[1] = new ImageView(images.get(EAST)[1]);
         imageViews.get(NORTH)[0] = new ImageView(images.get(NORTH)[0]); imageViews.get(NORTH)[1] = new ImageView(images.get(NORTH)[1]);
+        this.moveCycle.addAll(Arrays.asList(moves));
     }
 
     public void move(AbstractMap map, MoveDirection direction){

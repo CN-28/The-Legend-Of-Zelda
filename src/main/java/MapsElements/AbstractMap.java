@@ -1,12 +1,18 @@
 package MapsElements;
 
+import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+
+import static MapsElements.MoveDirection.*;
+import static MapsElements.MoveDirection.NORTH;
 
 public abstract class AbstractMap implements IWorldMap {
     public static Image grassTile, sandTile, waterTile, waterEdgeTile, pathTile, sandBarrierUpperRightCornerTile, sandBarrierBottomRightCornerTile,
@@ -17,14 +23,22 @@ public abstract class AbstractMap implements IWorldMap {
     grayBarrierTile, grayTile, graySphereTile, grayHiddenCave, grassBarrierUpperLeftCornerTile, grayBarrierBottomRightCornerTile, grayBarrierUpperLeftCornerTile, bottomLeftGrayTreeTile,
     upperLeftGrayTreeTile, upperMiddleGrayTreeTile, bottomMiddleGrayTreeTile, upperRightGrayTreeTile, bottomRightGrayTreeTile;
     protected static int size = 35;
+    protected int frameCount = 0;
     protected static IMapChangeObserver MapChangeObserver;
     public static final int width = 30;
     public static final int height = 20;
+    protected final boolean[][] occupancyMap = new boolean[height][width];
     public static final Vector2d lowerLeft = new Vector2d(0, 0);
     public static final Vector2d upperRight = new Vector2d(width - 1, height - 1);
     public final Group[][] nodes = new Group[height][width];
     public final GridPane grid = new GridPane();
     public static HashMap<String, AbstractMap> maps = new HashMap<>();
+    protected AnimationTimer animation;
+    protected static LinkedHashMap<MoveDirection, ArrayList<Octorok>> toMove = new LinkedHashMap<>();
+
+    static {
+        toMove.put(SOUTH, new ArrayList<>()); toMove.put(EAST, new ArrayList<>()); toMove.put(WEST, new ArrayList<>()); toMove.put(NORTH, new ArrayList<>());
+    }
 
     static {
         try {
@@ -81,7 +95,11 @@ public abstract class AbstractMap implements IWorldMap {
     }
 
     public boolean canMoveTo(Vector2d position){
-        return position.precedes(upperRight) && position.follows(lowerLeft);
+        return position.precedes(upperRight) && position.follows(lowerLeft) && !isOccupied(position);
+    }
+
+    public boolean isOccupied(Vector2d position){
+        return occupancyMap[position.getY()][position.getX()];
     }
 
     public static void addMapChangeObserver(IMapChangeObserver observer){

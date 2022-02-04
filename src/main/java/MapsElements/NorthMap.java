@@ -13,6 +13,7 @@ public class NorthMap extends AbstractMap {
         for (int i = 0; i < height; i++){
             for (int j = 0; j < width; j++){
                 this.nodes[i][j] = new Group();
+                this.occupancyMap[i][j] = true;
                 if (j == width - 1 && i <= 7 || i == 0 && j >= 22)
                     this.nodes[i][j].getChildren().add(new ImageView(sandSphereTile));
                 else if (i == 3 * height/5 + j){
@@ -27,21 +28,31 @@ public class NorthMap extends AbstractMap {
                 }
                 else if (j == width - 1 && i < 13 || j == width - 2 && i >= 7 && i <= 12 || j == width - 3 && i >= 8 && i <= 11 || j == width - 4 && i >= 9 && i <= 10){
                     this.nodes[i][j].getChildren().add(new ImageView(sandTile));
-                    if (i == 12 && j == width - 1) this.nodes[i][j].getChildren().add(new ImageView(sandBarrierUpperLeftCornerTile));
+                    this.occupancyMap[i][j] = false;
+                    if (i == 12 && j == width - 1) {
+                        this.nodes[i][j].getChildren().add(new ImageView(sandBarrierUpperLeftCornerTile));
+                        this.occupancyMap[i][j] = true;
+                    }
                 }
-                else if (i <= j - 22)
+                else if (i <= j - 22){
                     this.nodes[i][j].getChildren().add(new ImageView(sandTile));
+                    this.occupancyMap[i][j] = false;
+                }
                 else if ((i == height - 1 || i == height - 6) && j > 2 * width/5 && j < 3 * width/5 - 1 || (i == height - 2 || i == height - 5) && j >= 2 * width/5 && j < 3 * width/5
-                || (i >= height - 4 && i < height - 2) && j > 2 * width/5 - 2 && j < 3 * width/5 + 1)
+                || (i >= height - 4 && i < height - 2) && j > 2 * width/5 - 2 && j < 3 * width/5 + 1){
                     this.nodes[i][j].getChildren().add(new ImageView(pathTile));
+                    this.occupancyMap[i][j] = false;
+                }
                 else if (i > -j + 21 + height)
                     this.nodes[i][j].getChildren().add(new ImageView(sandBarrierTile));
                 else if (i == -j + 21 + height){
                     this.nodes[i][j].getChildren().add(new ImageView(grassTile));
                     this.nodes[i][j].getChildren().add(new ImageView(sandBarrierUpperLeftCornerTile));
                 }
-                else
+                else{
                     this.nodes[i][j].getChildren().add(new ImageView(grassTile));
+                    this.occupancyMap[i][j] = false;
+                }
                 this.grid.add(this.nodes[i][j], j, i);
             }
         }

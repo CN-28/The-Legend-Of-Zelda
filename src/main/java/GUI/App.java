@@ -13,30 +13,21 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-
 public class App extends Application implements IMapChangeObserver {
     protected static Scene scene;
     protected static GridPane interface_bar = new GridPane();
-    protected static AbstractMap map = new StartingMap();
+    public static AbstractMap map = new StartingMap();
     protected static final Hero hero = new Hero();
     protected static final VBox root = new VBox();
     protected static ImageView[] attackViews = new ImageView[8];
-    protected static boolean animationRunning = false;
+    public static boolean animationRunning = false;
     protected static int iter;
-    protected static int frameCount = 0;
     protected static int attackFrameCount = 0;
-    protected static AnimationTimer octorokAnimation, attackAnimation;
+    public static AnimationTimer attackAnimation;
     static {AbstractMap.getMapsReferences(map);}
-    static boolean octorokStarted = false;
     private static Octorok octorok;
     protected static int attackPower = 1;
     protected static Vector2d moveVector;
-    protected static LinkedHashMap<MoveDirection, ArrayList<Octorok>> toMove = new LinkedHashMap<>();
-    static {
-        toMove.put(SOUTH, new ArrayList<>()); toMove.put(EAST, new ArrayList<>()); toMove.put(WEST, new ArrayList<>()); toMove.put(NORTH, new ArrayList<>());
-    }
 
     public void init(){
         AbstractMap.addMapChangeObserver(this);
@@ -108,48 +99,8 @@ public class App extends Application implements IMapChangeObserver {
             }
         };
 
-
-        octorokAnimation = new AnimationTimer() {
-            public void handle(long now) {
-                if (frameCount % 8 == 0 && map instanceof EastMap){
-                    toMove.get(SOUTH).clear(); toMove.get(NORTH).clear(); toMove.get(EAST).clear(); toMove.get(WEST).clear();
-                    for (Integer i : EastMap.octoroks.keySet()){
-                        for (Octorok octorok : EastMap.octoroks.get(i).values()){
-                            if (octorok.prevImage != null)
-                                map.nodes[octorok.prevY][octorok.prevX].getChildren().remove(octorok.prevImage);
-
-                            if (octorok.i == 2)
-                                toMove.get(octorok.getOrientation().next()).add(octorok);
-                            else
-                                toMove.get(octorok.getOrientation()).add(octorok);
-
-                        }
-                    }
-
-                    for (MoveDirection direction : toMove.keySet()){
-                        for (Octorok octorok : toMove.get(direction)){
-                            if (octorok.i == 2 || octorok.i == 4)
-                                octorok.move(map, direction);
-                            map.nodes[octorok.getY()][octorok.getX()].getChildren().add(octorok.getOctorokAnimation()[octorok.i % 2]);
-                            octorok.prevImage = octorok.getOctorokAnimation()[octorok.i % 2];
-                            octorok.prevX = octorok.getX();
-                            octorok.prevY = octorok.getY();
-                            if (octorok.i == 4) octorok.i = -1;
-                            octorok.i += 1;
-                        }
-                    }
-                    frameCount = 0;
-                }
-                frameCount += 1;
-            }
-        };
-
         AnimationTimer gameLoop = new AnimationTimer() {
             public void handle(long currentNanoTime) {
-                if (!octorokStarted){
-                    octorokStarted = true;
-                    octorokAnimation.start();
-                }
             }
         };
         gameLoop.start();

@@ -12,11 +12,11 @@ public class SouthEastMap extends AbstractMap {
     public static final Vector2d leftBottomPassageBorder = new Vector2d(-1, 2 * height/5);
     public static final LinkedHashMap<Integer, LinkedHashMap<Integer, Tektite>> tektites = new LinkedHashMap<>();
 
-
     public SouthEastMap(){
         for (int i = 0; i < height; i++){
             for (int j = 0; j < width; j++){
                 this.nodes[i][j] = new Group();
+                this.occupancyMap[i][j] = true;
                 if (i >= -j + 18 + height)
                     this.nodes[i][j].getChildren().add(new ImageView(waterTile));
                 else if (i == height - 2 && (j >= 7 && j <= 18))
@@ -31,8 +31,10 @@ public class SouthEastMap extends AbstractMap {
                     this.nodes[i][j].getChildren().add(new ImageView(sandBarrierTile));
                 else if (i == -j + 17 + height && j < 24)
                     this.nodes[i][j].getChildren().add(new ImageView(bottomRightWaterCornerTile));
-                else if (j < width - 6)
+                else if (j < width - 6){
                     this.nodes[i][j].getChildren().add(new ImageView(sandTile));
+                    this.occupancyMap[i][j] = false;
+                }
                 else if (j == width - 6 && i <= 15)
                     this.nodes[i][j].getChildren().add(new ImageView(waterEdgeTile));
                 else
@@ -55,8 +57,10 @@ public class SouthEastMap extends AbstractMap {
     public boolean canMoveTo(Vector2d position){
         if (super.canMoveTo(position)) return true;
 
-        if (position.follows(upperLeftPassageBorder) && position.precedes(upperRightPassageBorder))
+        if (position.follows(upperLeftPassageBorder) && position.precedes(upperRightPassageBorder)){
             MapChangeObserver.notifyMapChange(maps.get("East"));
+            maps.get("East").animation.start();
+        }
         else if (position.follows(leftBottomPassageBorder) && position.precedes(leftUpperPassageBorder))
             MapChangeObserver.notifyMapChange(maps.get("South"));
 

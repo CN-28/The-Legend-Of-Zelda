@@ -13,6 +13,7 @@ public class WestMap extends AbstractMap {
         for (int i = 0; i < height; i++){
             for (int j = 0; j < width; j++){
                 this.nodes[i][j] = new Group();
+                this.occupancyMap[i][j] = true;
                 if (j > width - 5)
                     this.nodes[i][j].getChildren().add(new ImageView(grassBarrierTile));
                 else if (i == -j + 21 + height){
@@ -39,10 +40,14 @@ public class WestMap extends AbstractMap {
                     this.nodes[i][j].getChildren().add(new ImageView(grassTile));
                     this.nodes[i][j].getChildren().add(new ImageView(grassSphereTile));
                 }
-                else if (j <= 5 || i <= -j + 21)
+                else if (j <= 5 || i <= -j + 21){
                     this.nodes[i][j].getChildren().add(new ImageView(grayTile));
-                else
+                    this.occupancyMap[i][j] = false;
+                }
+                else{
                     this.nodes[i][j].getChildren().add(new ImageView(grassTile));
+                    this.occupancyMap[i][j] = false;
+                }
                 this.grid.add(this.nodes[i][j], j, i);
             }
         }

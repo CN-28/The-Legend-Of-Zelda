@@ -4,6 +4,7 @@ public abstract class Creature {
     protected Vector2d position;
     protected MoveDirection orientation;
     protected int health;
+    protected static final int size = 35;
 
     public abstract void move(AbstractMap map, MoveDirection direction);
 

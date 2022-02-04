@@ -8,10 +8,10 @@ import java.util.LinkedHashMap;
 public class EastMap extends AbstractMap {
     public static final Vector2d leftBottomPassageBorder = new Vector2d(-1, 2 * height/5);
     public static final Vector2d leftUpperPassageBorder = new Vector2d(-1, 3 * height/5 - 1);
-    public static final Vector2d upperLeftPassageBorder = new Vector2d(2 * width/5, -1);
-    public static final Vector2d upperRightPassageBorder = new Vector2d(3 * width/5 - 1, -1);
-    public static final Vector2d bottomLeftPassageBorder = new Vector2d(2 * width/5, height);
-    public static final Vector2d bottomRightPassageBorder = new Vector2d(3 * width/5 - 1, height);
+    public static final Vector2d upperLeftPassageBorder = new Vector2d(2 * width/5 + 1, -1);
+    public static final Vector2d upperRightPassageBorder = new Vector2d(3 * width/5 - 2, -1);
+    public static final Vector2d bottomLeftPassageBorder = new Vector2d(2 * width/5 + 1, height);
+    public static final Vector2d bottomRightPassageBorder = new Vector2d(3 * width/5 - 2, height);
     public static final LinkedHashMap<Integer, LinkedHashMap<Integer, Octorok>> octoroks = new LinkedHashMap<>();
 
     public EastMap() {
@@ -27,7 +27,7 @@ public class EastMap extends AbstractMap {
                     this.nodes[i][j].getChildren().add(new ImageView(sandBarrierBottomRightCornerTile));
                 else if (i > 3 * height/5 + j || i < 2 * height/5 - 1 - j)
                     this.nodes[i][j].getChildren().add(new ImageView(sandBarrierTile));
-                else if (i == height - 1 && (j > 7 && j < 10 || j > 19 && j < 24) || i == 0 && (j > 7 & j < 12 || j > 17 && j < 24))
+                else if (i == height - 1 && (j > 7 && j <= 10 || j >= 19 && j < 24) || i == 0 && (j > 7 & j <= 12 || j >= 17 && j < 24))
                     this.nodes[i][j].getChildren().add(new ImageView(sandSphereTile));
                 else if (j < width - 6)
                     this.nodes[i][j].getChildren().add(new ImageView(sandTile));
@@ -39,8 +39,8 @@ public class EastMap extends AbstractMap {
             }
         }
         addTreeWithHiddenCave(2, 7);
-        addTree(18, 10);
-        addTree(18, 18);
+        addTree(18, 11);
+        addTree(18, 17);
         for (int i = 5; i < 14; i += 4){
             for (int j = 12; j < 21; j += 4)
                 addBlocker(i, j);

@@ -13,7 +13,6 @@ import static MapsElements.MoveDirection.*;
 public class Octorok extends Creature {
     private static final HashMap<MoveDirection, Image[]> images = new HashMap<>();
     private final HashMap<MoveDirection, ImageView[]> imageViews = new HashMap<>();
-    private static final int size = 35;
     public int i = 0;
     public int prevX, prevY;
     public ImageView prevImage;
@@ -33,18 +32,15 @@ public class Octorok extends Creature {
         }
     }
 
-    {
+    public Octorok(int x, int y){
+        this.position = new Vector2d(x, y);
+        this.orientation = SOUTH;
+        this.health = 2;
         imageViews.put(SOUTH, new ImageView[2]); imageViews.put(EAST, new ImageView[2]); imageViews.put(WEST, new ImageView[2]); imageViews.put(NORTH, new ImageView[2]);
         imageViews.get(SOUTH)[0] = new ImageView(images.get(SOUTH)[0]); imageViews.get(SOUTH)[1] = new ImageView(images.get(SOUTH)[1]);
         imageViews.get(WEST)[0] = new ImageView(images.get(WEST)[0]); imageViews.get(WEST)[1] = new ImageView(images.get(WEST)[1]);
         imageViews.get(EAST)[0] = new ImageView(images.get(EAST)[0]); imageViews.get(EAST)[1] = new ImageView(images.get(EAST)[1]);
         imageViews.get(NORTH)[0] = new ImageView(images.get(NORTH)[0]); imageViews.get(NORTH)[1] = new ImageView(images.get(NORTH)[1]);
-    }
-
-    public Octorok(int x, int y){
-        this.position = new Vector2d(x, y);
-        this.orientation = SOUTH;
-        this.health = 2;
     }
 
     public void move(AbstractMap map, MoveDirection direction){

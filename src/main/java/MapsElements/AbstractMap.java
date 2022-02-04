@@ -11,7 +11,11 @@ import java.util.HashMap;
 public abstract class AbstractMap implements IWorldMap {
     public static Image grassTile, sandTile, waterTile, waterEdgeTile, pathTile, sandBarrierUpperRightCornerTile, sandBarrierBottomRightCornerTile,
     sandBarrierTile, bottomLeftSandTreeTile, upperLeftSandTreeTile, upperMiddleSandTreeTile, bottomMiddleSandTreeTile, bottomRightSandTreeTile, upperRightSandTreeTile,
-    sandBlockerTile, sandSphereTile, upperRightWaterTile, upperRightWaterCornerTile, bottomRightWaterCornerTile, blackTile;
+    sandBlockerTile, sandSphereTile, upperRightWaterTile, upperRightWaterCornerTile, bottomRightWaterCornerTile, blackTile, sandBarrierUpperLeftCornerTile,
+    sandBarrierBottomLeftCornerTile, grassBarrierUpperRightCornerTile, grassBarrierBottomRightCornerTile, grassBarrierTile, grassSphereTile, bottomLeftGrassTreeTile,
+    upperLeftGrassTreeTile, upperRightGrassTreeTile, bottomRightGrassTreeTile, grassBlockerTile, grassStatueTile, grassBarrierBottomLeftCornerTile, grayBarrierUpperRightCornerTile,
+    grayBarrierTile, grayTile, graySphereTile, grayHiddenCave, grassBarrierUpperLeftCornerTile, grayBarrierBottomRightCornerTile, grayBarrierUpperLeftCornerTile, bottomLeftGrayTreeTile,
+    upperLeftGrayTreeTile, upperMiddleGrayTreeTile, bottomMiddleGrayTreeTile, upperRightGrayTreeTile, bottomRightGrayTreeTile;
     protected static int size = 35;
     protected static IMapChangeObserver MapChangeObserver;
     public static final int width = 30;
@@ -44,6 +48,33 @@ public abstract class AbstractMap implements IWorldMap {
             upperRightWaterCornerTile = new Image(new FileInputStream("src/main/resources/upperRightCornerTile.png"), size, size, false, false);
             bottomRightWaterCornerTile = new Image(new FileInputStream("src/main/resources/bottomRightCornerTile.png"), size, size, false, false);
             blackTile = new Image(new FileInputStream("src/main/resources/blackTile.png"), size, size, false, false);
+            sandBarrierUpperLeftCornerTile = new Image(new FileInputStream("src/main/resources/sandBarrierUpperLeftCorner.png"), size, size, false, false);
+            sandBarrierBottomLeftCornerTile = new Image(new FileInputStream("src/main/resources/sandBarrierBottomLeftCorner.png"), size, size, false, false);
+            grassBarrierUpperRightCornerTile = new Image(new FileInputStream("src/main/resources/grassBarrierUpperRightCorner.png"), size, size, false, false);
+            grassBarrierBottomRightCornerTile = new Image(new FileInputStream("src/main/resources/grassBarrierBottomRightCorner.png"), size, size, false, false);
+            grassBarrierTile = new Image(new FileInputStream("src/main/resources/grassBarrierTile.png"), size, size, false, false);
+            grassSphereTile = new Image(new FileInputStream("src/main/resources/grassSphereTile.png"), size, size, false, false);
+            bottomLeftGrassTreeTile = new Image(new FileInputStream("src/main/resources/bottomLeftGrassTree.png"), size, size, false, false);
+            upperLeftGrassTreeTile = new Image(new FileInputStream("src/main/resources/upperLeftGrassTree.png"), size, size, false, false);
+            upperRightGrassTreeTile = new Image(new FileInputStream("src/main/resources/upperRightGrassTree.png"), size, size, false, false);
+            bottomRightGrassTreeTile = new Image(new FileInputStream("src/main/resources/bottomRightGrassTree.png"), size, size, false, false);
+            grassBlockerTile = new Image(new FileInputStream("src/main/resources/grassBlockerTile.png"), size, size, false, false);
+            grassStatueTile = new Image(new FileInputStream("src/main/resources/grassStatueTile.png"), size, size, false, false);
+            grassBarrierBottomLeftCornerTile = new Image(new FileInputStream("src/main/resources/grassBarrierBottomLeftCornerTile.png"), size, size, false, false);
+            grayBarrierUpperRightCornerTile = new Image(new FileInputStream("src/main/resources/grayBarrierUpperRightCornerTile.png"), size, size, false, false);
+            grayBarrierTile = new Image(new FileInputStream("src/main/resources/grayBarrierTile.png"), size, size, false, false);
+            grayTile = new Image(new FileInputStream("src/main/resources/grayTile.png"), size, size, false, false);
+            grayHiddenCave = new Image(new FileInputStream("src/main/resources/grayHiddenCave.png"), size, size, false, false);
+            graySphereTile = new Image(new FileInputStream("src/main/resources/graySphereTile.png"), size, size, false, false);
+            grassBarrierUpperLeftCornerTile = new Image(new FileInputStream("src/main/resources/grassBarrierUpperLeftCornerTile.png"), size, size, false, false);
+            grayBarrierBottomRightCornerTile = new Image(new FileInputStream("src/main/resources/grayBarrierBottomRightCornerTile.png"), size, size, false, false);
+            grayBarrierUpperLeftCornerTile = new Image(new FileInputStream("src/main/resources/grayBarrierUpperLeftCornerTile.png"), size, size, false, false);
+            bottomLeftGrayTreeTile = new Image(new FileInputStream("src/main/resources/bottomLeftGrayTree.png"), size, size, false, false);
+            upperLeftGrayTreeTile = new Image(new FileInputStream("src/main/resources/upperLeftGrayTree.png"), size, size, false, false);
+            upperMiddleGrayTreeTile = new Image(new FileInputStream("src/main/resources/upperMiddleGrayTree.png"), size, size, false, false);
+            bottomMiddleGrayTreeTile = new Image(new FileInputStream("src/main/resources/bottomMiddleGrayTree.png"), size, size, false, false);
+            upperRightGrayTreeTile = new Image(new FileInputStream("src/main/resources/upperRightGrayTree.png"), size, size, false, false);
+            bottomRightGrayTreeTile = new Image(new FileInputStream("src/main/resources/bottomRightGrayTree.png"), size, size, false, false);
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }

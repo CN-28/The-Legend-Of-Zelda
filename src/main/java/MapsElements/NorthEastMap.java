@@ -6,8 +6,8 @@ import javafx.scene.image.ImageView;
 public class NorthEastMap extends AbstractMap {
     public static final Vector2d leftBottomPassageBorder = new Vector2d(-1, 2 * height/5);
     public static final Vector2d leftUpperPassageBorder = new Vector2d(-1, 3 * height/5 - 1);
-    public static final Vector2d bottomLeftPassageBorder = new Vector2d(2 * width/5, height);
-    public static final Vector2d bottomRightPassageBorder = new Vector2d(3 * width/5 - 1, height);
+    public static final Vector2d bottomLeftPassageBorder = new Vector2d(2 * width/5 + 1, height);
+    public static final Vector2d bottomRightPassageBorder = new Vector2d(3 * width/5 - 2, height);
 
     public NorthEastMap() {
         for (int i = 0; i < height; i++){
@@ -15,6 +15,12 @@ public class NorthEastMap extends AbstractMap {
                 this.nodes[i][j] = new Group();
                 if (i <= j - 18)
                     this.nodes[i][j].getChildren().add(new ImageView(waterTile));
+                else if (i == height - 1 && (j > 7 & j <= 12 || j >= 17 && j < 24) || j == 0 && i <= 7 || i == 0 && j <= 16)
+                    this.nodes[i][j].getChildren().add(new ImageView(sandSphereTile));
+                else if (i == 3 * height/5 + j)
+                    this.nodes[i][j].getChildren().add(new ImageView(sandBarrierUpperRightCornerTile));
+                else if (i > 3 * height/5 + j)
+                    this.nodes[i][j].getChildren().add(new ImageView(sandBarrierTile));
                 else if (i == j - 17 && j < 24)
                     this.nodes[i][j].getChildren().add(new ImageView(upperRightWaterCornerTile));
                 else if (j < width - 6)

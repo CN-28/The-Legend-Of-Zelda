@@ -10,7 +10,6 @@ import static MapsElements.MoveDirection.*;
 public class Hero extends Creature {
     private static final HashMap<MoveDirection, ImageView[]> attackImageViews = new HashMap<>();
     private static final HashMap<MoveDirection, ImageView> basicImageViews = new HashMap<>();
-    private static final int size = 35;
     static {
         attackImageViews.put(SOUTH, new ImageView[8]);
         attackImageViews.put(EAST, new ImageView[8]);
@@ -56,7 +55,7 @@ public class Hero extends Creature {
     }
 
     public Hero() {
-        this.position = new Vector2d(1, 1);
+        this.position = new Vector2d(14, 9);
         this.orientation = SOUTH;
     }
 

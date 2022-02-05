@@ -17,7 +17,6 @@ public class App extends Application implements IMapChangeObserver {
     protected static Scene scene;
     protected static GridPane interface_bar = new GridPane();
     public static AbstractMap map = new StartingMap();
-    protected static final Hero hero = new Hero();
     protected static final VBox root = new VBox();
     protected static ImageView[] attackViews = new ImageView[8];
     public static boolean animationRunning = false;
@@ -46,6 +45,7 @@ public class App extends Application implements IMapChangeObserver {
 
 
         attackAnimation = new AnimationTimer(){
+            private final Hero hero = AbstractMap.hero;
             public void handle(long currTime){
                 if (attackFrameCount % 3 == 0){
                     doHandle();
@@ -55,6 +55,7 @@ public class App extends Application implements IMapChangeObserver {
             }
 
             private void doHandle(){
+                App.map.animation.stop();
                 if (iter - 2 >= 0){
                     map.nodes[hero.getY()][hero.getX()].getChildren().remove(attackViews[iter - 2]);
                     if (inBorders())
@@ -77,6 +78,8 @@ public class App extends Application implements IMapChangeObserver {
                         if (octorok.getHealth() > 0){
                             octorok.removeHealth(attackPower);
                             if (octorok.getHealth() <= 0){
+                                if (octorok.ballPushed)
+                                    EastMap.octoroksBalls.add(octorok.ball);
                                 map.nodes[octorok.getY()][octorok.getX()].getChildren().remove(octorok.getOctorokAnimation()[0]);
                                 map.nodes[octorok.getY()][octorok.getX()].getChildren().remove(octorok.getOctorokAnimation()[1]);
                                 EastMap.octoroks.get(octorok.getY()).remove(octorok.getX());
@@ -90,6 +93,7 @@ public class App extends Application implements IMapChangeObserver {
                     map.nodes[hero.getY()][hero.getX()].getChildren().add(hero.getPicture());
                     animationRunning = false;
                     attackAnimation.stop();
+                    App.map.animation.start();
                 }
             }
 
@@ -101,6 +105,7 @@ public class App extends Application implements IMapChangeObserver {
 
         AnimationTimer gameLoop = new AnimationTimer() {
             public void handle(long currentNanoTime) {
+                AbstractMap.maps.get("East").animation.start();
             }
         };
         gameLoop.start();
@@ -114,10 +119,10 @@ public class App extends Application implements IMapChangeObserver {
         scene.setOnKeyPressed(ke -> {
             if (!animationRunning){
                 switch (ke.getCode()) {
-                    case A -> moveHero(hero, WEST);
-                    case D -> moveHero(hero, EAST);
-                    case S -> moveHero(hero, SOUTH);
-                    case W -> moveHero(hero, NORTH);
+                    case A -> moveHero(AbstractMap.hero, WEST);
+                    case D -> moveHero(AbstractMap.hero, EAST);
+                    case S -> moveHero(AbstractMap.hero, SOUTH);
+                    case W -> moveHero(AbstractMap.hero, NORTH);
                     case SPACE -> renderAttackAnimation();
                 }
                 ke.consume();
@@ -133,11 +138,11 @@ public class App extends Application implements IMapChangeObserver {
 
     public void renderAttackAnimation(){
         iter = 0;
-        attackViews = hero.getAnimationAttack();
-        map.nodes[hero.getY()][hero.getX()].getChildren().remove(hero.getPicture());
+        attackViews = AbstractMap.hero.getAnimationAttack();
+        map.nodes[AbstractMap.hero.getY()][AbstractMap.hero.getX()].getChildren().remove(AbstractMap.hero.getPicture());
 
         animationRunning = true;
-        moveVector = hero.getOrientation().toUnitVector();
+        moveVector = AbstractMap.hero.getOrientation().toUnitVector();
         attackAnimation.start();
     }
 
@@ -152,17 +157,17 @@ public class App extends Application implements IMapChangeObserver {
     }
 
     public void renderHeroPic(){
-        map.nodes[hero.getY()][hero.getX()].getChildren().add(hero.getPicture());
+        map.nodes[AbstractMap.hero.getY()][AbstractMap.hero.getX()].getChildren().add(AbstractMap.hero.getPicture());
     }
 
     public void removeHeroPic(){
-        map.nodes[hero.getY()][hero.getX()].getChildren().remove(hero.getPicture());
+        map.nodes[AbstractMap.hero.getY()][AbstractMap.hero.getX()].getChildren().remove(AbstractMap.hero.getPicture());
     }
 
     public void notifyMapChange(AbstractMap newMap){
         root.getChildren().remove(map.grid);
         map = newMap;
         root.getChildren().add(map.grid);
-        hero.setPositionAfterMapChange();
+        AbstractMap.hero.setPositionAfterMapChange();
     }
 }

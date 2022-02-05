@@ -57,10 +57,8 @@ public class SouthEastMap extends AbstractMap {
     public boolean canMoveTo(Vector2d position){
         if (super.canMoveTo(position)) return true;
 
-        if (position.follows(upperLeftPassageBorder) && position.precedes(upperRightPassageBorder)){
+        if (position.follows(upperLeftPassageBorder) && position.precedes(upperRightPassageBorder))
             MapChangeObserver.notifyMapChange(maps.get("East"));
-            maps.get("East").animation.start();
-        }
         else if (position.follows(leftBottomPassageBorder) && position.precedes(leftUpperPassageBorder))
             MapChangeObserver.notifyMapChange(maps.get("South"));
 

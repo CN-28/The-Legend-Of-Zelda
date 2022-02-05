@@ -42,10 +42,8 @@ public class NorthEastMap extends AbstractMap {
 
         if (position.follows(leftBottomPassageBorder) && position.precedes(leftUpperPassageBorder))
             MapChangeObserver.notifyMapChange(maps.get("North"));
-        else if (position.follows(bottomLeftPassageBorder) && position.precedes(bottomRightPassageBorder)){
+        else if (position.follows(bottomLeftPassageBorder) && position.precedes(bottomRightPassageBorder))
             MapChangeObserver.notifyMapChange(maps.get("East"));
-            maps.get("East").animation.start();
-        }
 
         return false;
     }

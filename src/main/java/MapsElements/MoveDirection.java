@@ -24,6 +24,15 @@ public enum MoveDirection {
         };
     }
 
+    public MoveDirection opposite(){
+        return switch (this) {
+            case NORTH -> SOUTH;
+            case WEST -> EAST;
+            case EAST -> WEST;
+            case SOUTH -> NORTH;
+        };
+    }
+
     public MoveDirection next(){
         return switch (this) {
             case NORTH -> EAST;

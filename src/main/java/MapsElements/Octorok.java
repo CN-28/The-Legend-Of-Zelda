@@ -16,6 +16,8 @@ public class Octorok extends Creature {
     private static final HashMap<MoveDirection, Image[]> images = new HashMap<>();
     private final HashMap<MoveDirection, ImageView[]> imageViews = new HashMap<>();
     public final ArrayList<MoveDirection> moveCycle = new ArrayList<>();
+    public boolean ballPushed = false;
+    public OctorokAttackBall ball;
     public int i, prevX, prevY;
     public ImageView prevImage;
     static {
@@ -59,6 +61,11 @@ public class Octorok extends Creature {
         }
         else
             this.orientation = direction;
+    }
+
+    public boolean sees(Vector2d position){
+        return this.position.getY() == position.getY() && (this.position.getX() < position.getX() && this.orientation == EAST || this.position.getX() > position.getX() && this.orientation == WEST)
+                || this.position.getX() == position.getX() && (this.position.getY() < position.getY() && this.orientation == SOUTH || this.position.getY() > position.getY() && this.orientation == NORTH);
     }
 
     public ImageView[] getOctorokAnimation(){

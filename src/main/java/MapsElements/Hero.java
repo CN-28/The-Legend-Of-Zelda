@@ -56,6 +56,7 @@ public class Hero extends Creature {
 
     public Hero() {
         this.position = new Vector2d(14, 9);
+        this.health = 10;
         this.orientation = SOUTH;
     }
 

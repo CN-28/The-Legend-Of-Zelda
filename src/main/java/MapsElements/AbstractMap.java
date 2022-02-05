@@ -28,12 +28,13 @@ public abstract class AbstractMap implements IWorldMap {
     public static final int width = 30;
     public static final int height = 20;
     protected final boolean[][] occupancyMap = new boolean[height][width];
+    public static final Hero hero = new Hero();
     public static final Vector2d lowerLeft = new Vector2d(0, 0);
     public static final Vector2d upperRight = new Vector2d(width - 1, height - 1);
     public final Group[][] nodes = new Group[height][width];
     public final GridPane grid = new GridPane();
     public static HashMap<String, AbstractMap> maps = new HashMap<>();
-    protected AnimationTimer animation;
+    public AnimationTimer animation;
     protected static LinkedHashMap<MoveDirection, ArrayList<Octorok>> toMove = new LinkedHashMap<>();
 
     static {
@@ -96,6 +97,10 @@ public abstract class AbstractMap implements IWorldMap {
 
     public boolean canMoveTo(Vector2d position){
         return position.precedes(upperRight) && position.follows(lowerLeft) && !isOccupied(position);
+    }
+
+    public static boolean collidesWithHero(Vector2d position){
+        return position.equals(hero.getPosition());
     }
 
     public boolean isOccupied(Vector2d position){

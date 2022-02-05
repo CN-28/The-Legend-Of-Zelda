@@ -84,10 +84,8 @@ public class StartingMap extends AbstractMap {
     public boolean canMoveTo(Vector2d position){
         if (super.canMoveTo(position)) return true;
 
-        if (position.follows(rightBottomPassageBorder) && position.precedes(rightUpperPassageBorder)){
+        if (position.follows(rightBottomPassageBorder) && position.precedes(rightUpperPassageBorder))
             MapChangeObserver.notifyMapChange(maps.get("East"));
-            maps.get("East").animation.start();
-        }
         else if (position.follows(bottomLeftPassageBorder) && position.precedes(bottomRightPassageBorder))
             MapChangeObserver.notifyMapChange(maps.get("South"));
         else if (position.follows(upperLeftPassageBorder) && position.precedes(upperRightPassageBorder))

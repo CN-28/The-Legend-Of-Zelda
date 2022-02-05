@@ -5,6 +5,8 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 
 import static MapsElements.MoveDirection.*;
@@ -17,6 +19,7 @@ public class EastMap extends AbstractMap {
     public static final Vector2d bottomLeftPassageBorder = new Vector2d(2 * width/5 + 1, height);
     public static final Vector2d bottomRightPassageBorder = new Vector2d(3 * width/5 - 2, height);
     public static final LinkedHashMap<Integer, LinkedHashMap<Integer, Octorok>> octoroks = new LinkedHashMap<>();
+    public static final ArrayList<OctorokAttackBall> octoroksBalls = new ArrayList<>();
 
     public EastMap() {
         for (int i = 0; i < height; i++){
@@ -54,7 +57,6 @@ public class EastMap extends AbstractMap {
             for (int j = 11; j < 21; j += 4)
                 addBlocker(i, j);
         }
-
 
         octoroks.put(5, new LinkedHashMap<>());
         octoroks.get(5).put(8, new Octorok(8, 5, new MoveDirection[]{SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH,
@@ -95,6 +97,50 @@ public class EastMap extends AbstractMap {
             private int cnt = 0;
 
             public void handle(long now) {
+                if (frameCount % 6 == 0){
+                    Vector2d tempPos;
+                    for (Iterator<OctorokAttackBall> iter = octoroksBalls.iterator(); iter.hasNext();){
+                        OctorokAttackBall ball = iter.next();
+                        tempPos = ball.ballPosition.add(ball.ballDirection.toUnitVector());
+                        nodes[ball.ballPosition.getY() + ball.ballDirection.opposite().toUnitVector().getY()][ball.ballPosition.getX() + ball.ballDirection.opposite().toUnitVector().getX()].getChildren().remove(ball.getAttackBallImage());
+                        if (tempPos.precedes(upperRight) && tempPos.follows(lowerLeft) && maps.get("East").canMoveTo(tempPos)){
+                            ball.ballPosition = tempPos;
+                            nodes[tempPos.getY()][tempPos.getX()].getChildren().add(ball.getAttackBallImage());
+                        }
+                        else{
+                            nodes[ball.ballPosition.getY()][ball.ballPosition.getX()].getChildren().remove(ball.getAttackBallImage());
+                            iter.remove();
+                        }
+                    }
+
+                    for (Integer i : EastMap.octoroks.keySet()){
+                        for (Octorok octorok : EastMap.octoroks.get(i).values()){
+                            if (App.map instanceof EastMap && !octorok.ballPushed && (octorok.getX() == hero.getX() || octorok.getY() == hero.getY())){
+                                tempPos = octorok.getPosition().add(octorok.getOrientation().toUnitVector());
+                                if (maps.get("East").canMoveTo(tempPos) && octorok.sees(hero.getPosition())){
+                                    octorok.ball = new OctorokAttackBall(tempPos, octorok.getOrientation());
+                                    octorok.ballPushed = true;
+                                    nodes[octorok.ball.ballPosition.getY()][octorok.ball.ballPosition.getX()].getChildren().add(octorok.ball.getAttackBallImage());
+                                }
+                            }
+                            else if (octorok.ballPushed){
+                                tempPos = octorok.ball.ballPosition.add(octorok.ball.ballDirection.toUnitVector());
+                                nodes[octorok.ball.ballPosition.getY() + octorok.ball.ballDirection.opposite().toUnitVector().getY()][octorok.ball.ballPosition.getX() + octorok.ball.ballDirection.opposite().toUnitVector().getX()].getChildren().remove(octorok.ball.getAttackBallImage());
+                                if (tempPos.precedes(upperRight) && tempPos.follows(lowerLeft) && maps.get("East").canMoveTo(tempPos) && !AbstractMap.collidesWithHero(tempPos)){
+                                    octorok.ball.ballPosition = tempPos;
+                                    nodes[tempPos.getY()][tempPos.getX()].getChildren().add(octorok.ball.getAttackBallImage());
+                                }
+                                else {
+                                    if(AbstractMap.collidesWithHero(tempPos))
+                                        hero.removeHealth(1);
+                                    octorok.ballPushed = false;
+                                    nodes[octorok.ball.ballPosition.getY()][octorok.ball.ballPosition.getX()].getChildren().remove(octorok.ball.getAttackBallImage());
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if (frameCount % 8 == 0){
                     if (cnt % 2 == 0){
                         toMove.get(SOUTH).clear(); toMove.get(NORTH).clear(); toMove.get(EAST).clear(); toMove.get(WEST).clear();
@@ -109,7 +155,7 @@ public class EastMap extends AbstractMap {
                             if (octorok.prevImage != null)
                                 nodes[octorok.prevY][octorok.prevX].getChildren().remove(octorok.prevImage);
                             if (cnt % 2 == 0){
-                                octorok.move(App.map, direction);
+                                octorok.move(AbstractMap.maps.get("East"), direction);
                                 octorok.i += 1;
                             }
                             if (octorok.getHealth() > 0)
@@ -130,27 +176,27 @@ public class EastMap extends AbstractMap {
 
     public void addTreeWithHiddenCave(int i, int j){
         this.nodes[i][j].getChildren().add(new ImageView(upperLeftSandTreeTile));
-        this.occupancyMap[i][j] = true;
         this.nodes[i + 1][j].getChildren().add(new ImageView(bottomLeftSandTreeTile));
-        this.occupancyMap[i + 1][j] = true;
         this.nodes[i + 1][j + 1].getChildren().add(new ImageView(bottomMiddleSandTreeTile));
-        this.occupancyMap[i + 1][j + 1] = true;
         this.nodes[i][j + 1].getChildren().add(new ImageView(upperMiddleSandTreeTile));
-        this.occupancyMap[i][j + 1] = true;
         this.nodes[i][j + 2].getChildren().add(new ImageView(upperRightSandTreeTile));
-        this.occupancyMap[i][j + 2] = true;
         this.nodes[i + 1][j + 2].getChildren().add(new ImageView(bottomRightSandTreeTile));
+        this.occupancyMap[i + 1][j] = true;
+        this.occupancyMap[i][j] = true;
+        this.occupancyMap[i + 1][j + 1] = true;
+        this.occupancyMap[i][j + 1] = true;
+        this.occupancyMap[i][j + 2] = true;
         this.occupancyMap[i + 1][j + 2] = true;
     }
 
     public void addTree(int i, int j){
         this.nodes[i][j].getChildren().add(new ImageView(upperLeftSandTreeTile));
-        this.occupancyMap[i][j] = true;
         this.nodes[i + 1][j].getChildren().add(new ImageView(bottomLeftSandTreeTile));
-        this.occupancyMap[i + 1][j] = true;
         this.nodes[i][j + 1].getChildren().add(new ImageView(upperRightSandTreeTile));
-        this.occupancyMap[i][j + 1] = true;
         this.nodes[i + 1][j + 1].getChildren().add(new ImageView(bottomRightSandTreeTile));
+        this.occupancyMap[i][j] = true;
+        this.occupancyMap[i + 1][j] = true;
+        this.occupancyMap[i][j + 1] = true;
         this.occupancyMap[i + 1][j + 1] = true;
     }
 
@@ -162,18 +208,12 @@ public class EastMap extends AbstractMap {
     public boolean canMoveTo(Vector2d position){
         if (super.canMoveTo(position)) return true;
 
-        if (position.follows(leftBottomPassageBorder) && position.precedes(leftUpperPassageBorder)){
+        if (position.follows(leftBottomPassageBorder) && position.precedes(leftUpperPassageBorder))
             MapChangeObserver.notifyMapChange(maps.get("Start"));
-            this.animation.stop();
-        }
-        else if (position.follows(upperLeftPassageBorder) && position.precedes(upperRightPassageBorder)){
+        else if (position.follows(upperLeftPassageBorder) && position.precedes(upperRightPassageBorder))
             MapChangeObserver.notifyMapChange(maps.get("NorthEast"));
-            this.animation.stop();
-        }
-        else if (position.follows(bottomLeftPassageBorder) && position.precedes(bottomRightPassageBorder)){
+        else if (position.follows(bottomLeftPassageBorder) && position.precedes(bottomRightPassageBorder))
             MapChangeObserver.notifyMapChange(maps.get("SouthEast"));
-            this.animation.stop();
-        }
 
         return false;
     }

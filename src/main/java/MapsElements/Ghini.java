@@ -1,39 +1,59 @@
 package MapsElements;
 
+import GUI.App;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.HashMap;
 
 import static MapsElements.MoveDirection.*;
 
 public class Ghini extends Creature {
-    private static final Image[] images = new Image[2];
-    private final ImageView[] imageViews = new ImageView[2];
+    private static final HashMap<MoveDirection, Image> images = new HashMap<>();
+    private final HashMap<MoveDirection, ImageView[]> imageViews = new HashMap<>();
+    public boolean push = false;
+    public int pushCnt = 4;
 
     static {
         try {
-            images[0] = new Image(new FileInputStream("src/main/resources/ghiniLeft.png"), size, size, false, false);
-            images[1] = new Image(new FileInputStream("src/main/resources/ghiniRight.png"), size, size, false, false);
+            images.put(WEST, new Image(new FileInputStream("src/main/resources/ghiniLeft.png"), size, size, false, false));
+            images.put(EAST, new Image(new FileInputStream("src/main/resources/ghiniRight.png"), size, size, false, false));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    public Ghini(int x, int y){
+    public Ghini(int x, int y, MoveDirection[] moves){
         this.position = new Vector2d(x, y);
         this.health = 3;
-        this.orientation = SOUTH;
-        imageViews[0] = new ImageView(images[0]);
-        imageViews[1] = new ImageView(images[1]);
+        this.i = 0;
+        imageViews.put(WEST, new ImageView[]{new ImageView(images.get(WEST))});
+        imageViews.put(EAST, new ImageView[]{new ImageView(images.get(EAST))});
+        this.moveCycle.addAll(Arrays.asList(moves));
     }
 
-    public void move(AbstractMap map, MoveDirection direction) {
-
+    public void removeHealth(int attackPower){
+        super.removeHealth(attackPower);
+        if (this.health > 0){
+            this.pushCnt = 4;
+            this.push = true;
+        }
     }
 
-    public ImageView[] getGhiniAnimation(){
-        return this.imageViews;
+    public void pushBack(AbstractMap map, MoveDirection direction){
+        Vector2d newPos = this.position.add(direction.toUnitVector());
+        changeCreaturePosition(map, newPos);
+    }
+
+    public void removeCreature() {
+        App.map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[0]);
+        App.map.mobs.get(this.getY()).get(this.getX()).remove(this);
+    }
+
+    public ImageView[] getCreatureAnimation() {
+        return this.imageViews.get(this.orientation);
     }
 }

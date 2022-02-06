@@ -1,16 +1,19 @@
 package MapsElements;
 
+import GUI.App;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static MapsElements.MoveDirection.*;
 
 public class Zola extends Creature {
     private static final Image[] images = new Image[5];
     private final ImageView[] imageViews = new ImageView[5];
+    public boolean ballPushed = false;
 
     static {
         try {
@@ -24,10 +27,8 @@ public class Zola extends Creature {
         }
     }
 
-    public Zola(int x, int y){
-        this.position = new Vector2d(x, y);
-        this.health = 3;
-        this.orientation = SOUTH;
+    public Zola(){
+        this.health = 2;
         imageViews[0] = new ImageView(images[0]);
         imageViews[1] = new ImageView(images[1]);
         imageViews[2] = new ImageView(images[2]);
@@ -35,11 +36,33 @@ public class Zola extends Creature {
         imageViews[4] = new ImageView(images[4]);
     }
 
-    public void move(AbstractMap map, MoveDirection direction) {
+    public void move(AbstractMap map, MoveDirection direction){
+        if (direction == SOUTH)
+            this.prevImage = getCreatureAnimation()[2];
+        else
+            this.prevImage = getCreatureAnimation()[3];
 
+        map.nodes[this.getY()][this.getX()].getChildren().add(this.prevImage);
+
+        int index = map.zolaPositions.get(ThreadLocalRandom.current().nextInt(0, map.zolaPositions.size()));
+        this.position = new Vector2d(index % AbstractMap.width, index / AbstractMap.width);
     }
 
-    public ImageView[] getZolaAnimation(){
+    public void removeCreature() {
+        App.map.zola = null;
+        App.map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[2]);
+        App.map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[3]);
+        if (this.prevY != -1){
+            App.map.nodes[this.prevY][this.prevX].getChildren().remove(this.getCreatureAnimation()[2]);
+            App.map.nodes[this.prevY][this.prevX].getChildren().remove(this.getCreatureAnimation()[3]);
+        }
+        if (App.map.mobs.containsKey(this.getY()) && App.map.mobs.get(this.getY()).containsKey(this.getX()))
+            App.map.mobs.get(this.getY()).get(this.getX()).remove(this);
+        if (prevX != -1 && App.map.mobs.containsKey(this.prevY) && App.map.mobs.get(this.prevY).containsKey(this.prevX))
+            App.map.mobs.get(this.prevY).get(this.prevX).remove(this);
+    }
+
+    public ImageView[] getCreatureAnimation() {
         return this.imageViews;
     }
 }

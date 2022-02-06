@@ -1,7 +1,10 @@
 package MapsElements;
 
+import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
+
+import static MapsElements.MoveDirection.*;
 
 public class NorthMap extends AbstractMap {
     public static final Vector2d bottomLeftPassageBorder = new Vector2d(2 * width/5 + 1, height);
@@ -56,6 +59,34 @@ public class NorthMap extends AbstractMap {
                 this.grid.add(this.nodes[i][j], j, i);
             }
         }
+
+        addGhini(5, 5, new MoveDirection[]{WEST, WEST, WEST, WEST, EAST, EAST, EAST, EAST});
+        addGhini(20, 5, new MoveDirection[]{WEST, WEST, WEST, WEST, EAST, EAST, EAST, EAST});
+        addGhini(8, 7, new MoveDirection[]{WEST, WEST, WEST, WEST, EAST, EAST, EAST, EAST});
+        addGhini(12, 9, new MoveDirection[]{WEST, WEST, WEST, WEST, EAST, EAST, EAST, EAST});
+        addGhini(6, 5, new MoveDirection[]{WEST, WEST, WEST, WEST, EAST, EAST, EAST, EAST});
+        addGhini(7, 5, new MoveDirection[]{WEST, WEST, WEST, WEST, EAST, EAST, EAST, EAST});
+        addGhini(7, 15, new MoveDirection[]{WEST, WEST, WEST, WEST, EAST, EAST, EAST, EAST});
+        addGhini(23, 14, new MoveDirection[]{WEST, WEST, WEST, WEST, EAST, EAST, EAST, EAST});
+        addGhini(17, 10, new MoveDirection[]{WEST, WEST, WEST, WEST, EAST, EAST, EAST, EAST});
+        addGhini(5, 8, new MoveDirection[]{WEST, WEST, WEST, WEST, EAST, EAST, EAST, EAST});
+        addGhini(15, 1, new MoveDirection[]{EAST, EAST, EAST, EAST, WEST, WEST, WEST, WEST});
+        addGhini(8, 2, new MoveDirection[]{EAST, EAST, EAST, EAST, WEST, WEST, WEST, WEST});
+        addGhini(24, 3, new MoveDirection[]{EAST, EAST, EAST, EAST, WEST, WEST, WEST, WEST});
+        addGhini(20, 8, new MoveDirection[]{EAST, EAST, EAST, EAST, WEST, WEST, WEST, WEST});
+
+        animation = new AnimationTimer() {
+            public void handle(long now){
+                if (frameCount % 3 == 0)
+                    handleGhiniPushBack("North");
+
+                if (frameCount % 14 == 0){
+                    handleGhiniMovement("North");
+                    frameCount = 0;
+                }
+                frameCount += 1;
+            }
+        };
     }
 
     public boolean canMoveTo(Vector2d position){

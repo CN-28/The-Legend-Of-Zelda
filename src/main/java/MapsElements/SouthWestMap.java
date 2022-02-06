@@ -1,16 +1,17 @@
 package MapsElements;
 
+import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 
-import java.util.LinkedHashMap;
+import static MapsElements.MoveDirection.EAST;
+import static MapsElements.MoveDirection.WEST;
 
 public class SouthWestMap extends AbstractMap {
     public static final Vector2d rightBottomPassageBorder = new Vector2d(width, 2 * height/5);
     public static final Vector2d rightUpperPassageBorder = new Vector2d(width, 3 * height/5 - 1);
     public static final Vector2d upperLeftPassageBorder = new Vector2d(2 * width/5 + 1, -1);
     public static final Vector2d upperRightPassageBorder = new Vector2d(3 * width/5 - 2, -1);
-    public static final LinkedHashMap<Integer, LinkedHashMap<Integer, Ghini>> ghinis = new LinkedHashMap<>();
 
     public SouthWestMap(){
         for (int i = 0; i < height; i++){
@@ -46,16 +47,20 @@ public class SouthWestMap extends AbstractMap {
                 this.grid.add(this.nodes[i][j], j, i);
             }
         }
+        addGhini(20, 8, new MoveDirection[]{EAST, EAST, EAST, EAST, WEST, WEST, WEST, WEST});
 
-        Ghini ghini;
-        for (int i = 4; i < 14; i += 3){
-            ghinis.put(i, new LinkedHashMap<>());
-            for (int j = 10; j < 20; j += 3){
-                ghini = new Ghini(i, j);
-                ghinis.get(i).put(j, ghini);
-                nodes[i][j].getChildren().add(ghini.getGhiniAnimation()[0]);
+        animation = new AnimationTimer() {
+            public void handle(long now) {
+                if (frameCount % 3 == 0)
+                    handleGhiniPushBack("SouthWest");
+
+                if (frameCount % 14 == 0){
+                    handleGhiniMovement("SouthWest");
+                    frameCount = 0;
+                }
+                frameCount += 1;
             }
-        }
+        };
     }
 
     public boolean canMoveTo(Vector2d position){

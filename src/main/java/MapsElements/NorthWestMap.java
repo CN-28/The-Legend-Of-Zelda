@@ -1,5 +1,6 @@
 package MapsElements;
 
+import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 
@@ -31,6 +32,12 @@ public class NorthWestMap extends AbstractMap {
             }
         }
         addBigTree(18, 9); addBigTree(18, 18);
+
+        animation = new AnimationTimer() {
+            public void handle(long now) {
+
+            }
+        };
     }
 
     public void addBigTree(int i, int j){

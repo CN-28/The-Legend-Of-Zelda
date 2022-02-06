@@ -1,7 +1,11 @@
 package MapsElements;
 
+import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
+
+import static MapsElements.MoveDirection.*;
+import static MapsElements.MoveDirection.SOUTH;
 
 public class WestMap extends AbstractMap {
     public static final Vector2d bottomLeftPassageBorder = new Vector2d(2 * width/5 + 1, height);
@@ -51,6 +55,36 @@ public class WestMap extends AbstractMap {
                 this.grid.add(this.nodes[i][j], j, i);
             }
         }
+        addGhini(20, 8, new MoveDirection[]{EAST, EAST, EAST, EAST, WEST, WEST, WEST, WEST});
+        addTektite(4, 15, new MoveDirection[]{NORTH_EAST, NORTH_EAST, WEST, WEST, NORTH, NORTH, SOUTH_WEST, SOUTH_WEST, SOUTH_EAST, SOUTH_EAST});
+        addOctorok(9, height - 4, new MoveDirection[]{NORTH, NORTH, NORTH, NORTH, NORTH, NORTH, NORTH, NORTH, NORTH, NORTH, NORTH, NORTH,
+                WEST, WEST, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, EAST, EAST});
+        addOctorok(20, 7, new MoveDirection[]{NORTH, NORTH, NORTH, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST,SOUTH, SOUTH,
+                SOUTH, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST});
+
+        animation = new AnimationTimer() {
+            public void handle(long now) {
+                if (frameCount % 3 == 0)
+                    handleGhiniPushBack("West");
+
+                if (frameCount % 6 == 0)
+                    handleOctorokBallsAttacks("West");
+
+                if (frameCount % 8 == 0)
+                    handleOctorokMovement("West");
+
+                if (frameCount % 12 == 0)
+                    handleTektiteMovement("West");
+
+                if (frameCount % 14 == 0)
+                    handleGhiniMovement("West");
+
+                if (frameCount % 168 == 0)
+                    frameCount = 0;
+
+                frameCount += 1;
+            }
+        };
     }
 
     public boolean canMoveTo(Vector2d position){

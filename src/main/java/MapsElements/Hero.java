@@ -83,6 +83,14 @@ public class Hero extends Creature {
             this.setPosition(x, (AbstractMap.height - y - 1) % AbstractMap.height);
     }
 
+    public ImageView[] getCreatureAnimation(){
+        return null;
+    }
+
+    public void removeCreature(){
+
+    }
+
     public ImageView getPicture(){
         return basicImageViews.get(this.orientation);
     }

@@ -16,15 +16,16 @@ import javafx.stage.Stage;
 public class App extends Application implements IMapChangeObserver {
     protected static Scene scene;
     protected static GridPane interface_bar = new GridPane();
-    public static AbstractMap map = new StartingMap();
+    public static AbstractMap map;
     protected static final VBox root = new VBox();
     protected static ImageView[] attackViews = new ImageView[8];
     public static boolean animationRunning = false;
     protected static int iter;
     protected static int attackFrameCount = 0;
     public static AnimationTimer attackAnimation;
-    static {AbstractMap.getMapsReferences(map);}
-    private static Octorok octorok;
+    static {AbstractMap.getMapsReferences(new StartingMap());
+    map = AbstractMap.maps.get("Start");}
+    private static Creature mob;
     protected static int attackPower = 1;
     protected static Vector2d moveVector;
 
@@ -55,7 +56,6 @@ public class App extends Application implements IMapChangeObserver {
             }
 
             private void doHandle(){
-                App.map.animation.stop();
                 if (iter - 2 >= 0){
                     map.nodes[hero.getY()][hero.getX()].getChildren().remove(attackViews[iter - 2]);
                     if (inBorders())
@@ -69,21 +69,17 @@ public class App extends Application implements IMapChangeObserver {
                 iter += 2;
                 if (iter >= attackViews.length){
                     // handleAttackDamageToCreature
-                    if (EastMap.octoroks.containsKey(hero.getY()) && EastMap.octoroks.get(hero.getY()).containsKey(hero.getX()) || EastMap.octoroks.containsKey(hero.getY() + moveVector.getY()) && EastMap.octoroks.get(hero.getY() + moveVector.getY()).containsKey(hero.getX() + moveVector.getX())){
-                        if (EastMap.octoroks.containsKey(hero.getY()) && EastMap.octoroks.get(hero.getY()).containsKey(hero.getX()))
-                            octorok = EastMap.octoroks.get(hero.getY()).get(hero.getX());
+                    if (App.map.mobs.containsKey(hero.getY()) && App.map.mobs.get(hero.getY()).containsKey(hero.getX()) && App.map.mobs.get(hero.getY()).get(hero.getX()).size() > 0
+                            || App.map.mobs.containsKey(hero.getY() + moveVector.getY()) && App.map.mobs.get(hero.getY() + moveVector.getY()).containsKey(hero.getX() + moveVector.getX()) && App.map.mobs.get(hero.getY() + moveVector.getY()).get(hero.getX() + moveVector.getX()).size() > 0){
+                        if (App.map.mobs.containsKey(hero.getY()) && App.map.mobs.get(hero.getY()).containsKey(hero.getX()) && App.map.mobs.get(hero.getY()).get(hero.getX()).size() > 0)
+                            mob = App.map.mobs.get(hero.getY()).get(hero.getX()).get(App.map.mobs.get(hero.getY()).get(hero.getX()).size() - 1);
                         else
-                            octorok = EastMap.octoroks.get(hero.getY() + moveVector.getY()).get(hero.getX() + moveVector.getX());
+                            mob = App.map.mobs.get(hero.getY() + moveVector.getY()).get(hero.getX() + moveVector.getX()).get(App.map.mobs.get(hero.getY() + moveVector.getY()).get(hero.getX() + moveVector.getX()).size() - 1);
 
-                        if (octorok.getHealth() > 0){
-                            octorok.removeHealth(attackPower);
-                            if (octorok.getHealth() <= 0){
-                                if (octorok.ballPushed)
-                                    EastMap.octoroksBalls.add(octorok.ball);
-                                map.nodes[octorok.getY()][octorok.getX()].getChildren().remove(octorok.getOctorokAnimation()[0]);
-                                map.nodes[octorok.getY()][octorok.getX()].getChildren().remove(octorok.getOctorokAnimation()[1]);
-                                EastMap.octoroks.get(octorok.getY()).remove(octorok.getX());
-                            }
+                        if (mob.getHealth() > 0){
+                            mob.removeHealth(attackPower);
+                            if (mob.getHealth() <= 0)
+                                mob.removeCreature();
                         }
                     }
 
@@ -106,6 +102,13 @@ public class App extends Application implements IMapChangeObserver {
         AnimationTimer gameLoop = new AnimationTimer() {
             public void handle(long currentNanoTime) {
                 AbstractMap.maps.get("East").animation.start();
+                AbstractMap.maps.get("SouthEast").animation.start();
+                AbstractMap.maps.get("North").animation.start();
+                AbstractMap.maps.get("NorthEast").animation.start();
+                AbstractMap.maps.get("South").animation.start();
+                AbstractMap.maps.get("SouthWest").animation.start();
+                AbstractMap.maps.get("West").animation.start();
+                AbstractMap.maps.get("NorthWest").animation.start();
             }
         };
         gameLoop.start();
@@ -143,6 +146,7 @@ public class App extends Application implements IMapChangeObserver {
 
         animationRunning = true;
         moveVector = AbstractMap.hero.getOrientation().toUnitVector();
+        App.map.animation.stop();
         attackAnimation.start();
     }
 

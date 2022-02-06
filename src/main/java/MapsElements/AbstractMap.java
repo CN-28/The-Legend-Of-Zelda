@@ -1,5 +1,6 @@
 package MapsElements;
 
+import GUI.App;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
@@ -9,7 +10,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static MapsElements.MoveDirection.*;
 import static MapsElements.MoveDirection.NORTH;
@@ -35,10 +38,16 @@ public abstract class AbstractMap implements IWorldMap {
     public final GridPane grid = new GridPane();
     public static HashMap<String, AbstractMap> maps = new HashMap<>();
     public AnimationTimer animation;
-    protected static LinkedHashMap<MoveDirection, ArrayList<Octorok>> toMove = new LinkedHashMap<>();
-
-    static {
+    protected LinkedHashMap<MoveDirection, ArrayList<Creature>> toMove = new LinkedHashMap<>();
+    public final LinkedHashMap<Integer, LinkedHashMap<Integer, ArrayList<Creature>>> mobs = new LinkedHashMap<>();
+    public final ArrayList<OctorokAttackBall> octoroksBalls = new ArrayList<>();
+    public ZolaAttackBall zolaAttackBall;
+    public Zola zola;
+    public ArrayList<Integer> zolaPositions = new ArrayList<>();
+    public int octorokCnt = 0; public int zolaCnt = 0; public int tektiteCnt = 0;
+    {
         toMove.put(SOUTH, new ArrayList<>()); toMove.put(EAST, new ArrayList<>()); toMove.put(WEST, new ArrayList<>()); toMove.put(NORTH, new ArrayList<>());
+        toMove.put(NORTH_EAST, new ArrayList<>()); toMove.put(NORTH_WEST, new ArrayList<>()); toMove.put(SOUTH_EAST, new ArrayList<>()); toMove.put(SOUTH_WEST, new ArrayList<>());
     }
 
     static {
@@ -97,6 +106,285 @@ public abstract class AbstractMap implements IWorldMap {
 
     public boolean canMoveTo(Vector2d position){
         return position.precedes(upperRight) && position.follows(lowerLeft) && !isOccupied(position);
+    }
+
+    public void addOctorok(int x, int y, MoveDirection[] moves){
+        if (!mobs.containsKey(y))
+            mobs.put(y, new LinkedHashMap<>());
+        if (!mobs.get(y).containsKey(x))
+            mobs.get(y).put(x, new ArrayList<>());
+        mobs.get(y).get(x).add(new Octorok(x, y, moves));
+    }
+
+    public void addTektite(int x, int y, MoveDirection[] moves){
+        if (!mobs.containsKey(y))
+            mobs.put(y, new LinkedHashMap<>());
+        if (!mobs.get(y).containsKey(x))
+            mobs.get(y).put(x, new ArrayList<>());
+        mobs.get(y).get(x).add(new Tektite(x, y, moves));
+    }
+
+    public void addGhini(int x, int y, MoveDirection[] moves){
+        if (!mobs.containsKey(y))
+            mobs.put(y, new LinkedHashMap<>());
+        if (!mobs.get(y).containsKey(x))
+            mobs.get(y).put(x, new ArrayList<>());
+        mobs.get(y).get(x).add(new Ghini(x, y, moves));
+    }
+
+    public void addZola(){
+        this.zola = new Zola();
+    }
+
+    public void handleOctorokBallsAttacks(String map){
+        Vector2d tempPos;
+        for (Iterator<OctorokAttackBall> iter = octoroksBalls.iterator(); iter.hasNext();){
+            OctorokAttackBall ball = iter.next();
+            tempPos = ball.ballPosition.add(ball.ballDirection.toUnitVector());
+            nodes[ball.ballPosition.getY() + ball.ballDirection.opposite().toUnitVector().getY()][ball.ballPosition.getX() + ball.ballDirection.opposite().toUnitVector().getX()].getChildren().remove(ball.getAttackBallImage());
+            if (tempPos.precedes(upperRight) && tempPos.follows(lowerLeft) && maps.get(map).canMoveTo(tempPos)){
+                ball.ballPosition = tempPos;
+                nodes[tempPos.getY()][tempPos.getX()].getChildren().add(ball.getAttackBallImage());
+            }
+            else{
+                nodes[ball.ballPosition.getY()][ball.ballPosition.getX()].getChildren().remove(ball.getAttackBallImage());
+                iter.remove();
+            }
+        }
+
+        for (Integer i : mobs.keySet()){
+            for (Integer j : mobs.get(i).keySet()){
+                for (Creature creature : mobs.get(i).get(j)){
+                    if (creature instanceof Octorok octorok){
+                        if (App.map.equals(AbstractMap.maps.get(map)) && !octorok.ballPushed && (octorok.getX() == hero.getX() || octorok.getY() == hero.getY())){
+                            tempPos = octorok.getPosition().add(octorok.getOrientation().toUnitVector());
+                            if (maps.get(map).canMoveTo(tempPos) && octorok.sees(hero.getPosition())){
+                                octorok.ball = new OctorokAttackBall(tempPos, octorok.getOrientation());
+                                octorok.ballPushed = true;
+                                nodes[octorok.ball.ballPosition.getY()][octorok.ball.ballPosition.getX()].getChildren().add(octorok.ball.getAttackBallImage());
+                            }
+                        }
+                        else if (octorok.ballPushed){
+                            tempPos = octorok.ball.ballPosition.add(octorok.ball.ballDirection.toUnitVector());
+                            nodes[octorok.ball.ballPosition.getY() + octorok.ball.ballDirection.opposite().toUnitVector().getY()][octorok.ball.ballPosition.getX() + octorok.ball.ballDirection.opposite().toUnitVector().getX()].getChildren().remove(octorok.ball.getAttackBallImage());
+                            if (tempPos.precedes(upperRight) && tempPos.follows(lowerLeft) && maps.get(map).canMoveTo(tempPos) && !AbstractMap.collidesWithHero(tempPos)){
+                                octorok.ball.ballPosition = tempPos;
+                                nodes[tempPos.getY()][tempPos.getX()].getChildren().add(octorok.ball.getAttackBallImage());
+                            }
+                            else {
+                                if(AbstractMap.collidesWithHero(tempPos))
+                                    hero.removeHealth(1);
+                                octorok.ballPushed = false;
+                                nodes[octorok.ball.ballPosition.getY()][octorok.ball.ballPosition.getX()].getChildren().remove(octorok.ball.getAttackBallImage());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void handleOctorokMovement(String map){
+        if (octorokCnt % 2 == 0){
+            toMove.get(SOUTH).clear(); toMove.get(NORTH).clear(); toMove.get(EAST).clear(); toMove.get(WEST).clear();
+            for (Integer i : mobs.keySet()){
+                for (Integer j : mobs.get(i).keySet()){
+                    for (Creature creature : mobs.get(i).get(j)){
+                        if (creature instanceof Octorok)
+                            toMove.get(creature.moveCycle.get(creature.i)).add(creature);
+                    }
+                }
+            }
+        }
+
+        for (MoveDirection direction : toMove.keySet()){
+            for (Creature creature : toMove.get(direction)){
+                if (creature instanceof Octorok) {
+                    if (creature.prevImage != null)
+                        nodes[creature.prevY][creature.prevX].getChildren().remove(creature.prevImage);
+                    if (octorokCnt % 2 == 0) {
+                        creature.move(AbstractMap.maps.get(map), direction);
+                        creature.i += 1;
+                    }
+                    if (creature.getHealth() > 0)
+                        nodes[creature.getY()][creature.getX()].getChildren().add(creature.getCreatureAnimation()[octorokCnt % 2]);
+                    creature.prevImage = creature.getCreatureAnimation()[octorokCnt % 2];
+                    creature.prevX = creature.getX();
+                    creature.prevY = creature.getY();
+                    if (creature.i == creature.moveCycle.size()) creature.i = 0;
+                }
+            }
+        }
+        octorokCnt += 1;
+    }
+
+    public void handleGhiniPushBack(String map){
+        toMove.get(EAST).clear(); toMove.get(WEST).clear();
+        for (Integer i : mobs.keySet()){
+            for (Integer j : mobs.get(i).keySet()){
+                for (Creature creature : mobs.get(i).get(j)){
+                    if(creature instanceof Ghini && ((Ghini) creature).push){
+                        if (((Ghini) creature).pushCnt > 0){
+                            toMove.get(creature.getOrientation()).add(creature);
+                            ((Ghini) creature).pushCnt -= 1;
+                        }
+                        else
+                            ((Ghini) creature).push = false;
+                    }
+                }
+            }
+        }
+
+        for (MoveDirection direction : toMove.keySet()){
+            for (Creature creature : toMove.get(direction)){
+                if (creature instanceof Ghini){
+                    if (creature.prevImage != null)
+                        nodes[creature.prevY][creature.prevX].getChildren().remove(creature.prevImage);
+
+                    ((Ghini) creature).pushBack(maps.get(map), hero.getOrientation());
+
+                    if (creature.getHealth() > 0)
+                        nodes[creature.getY()][creature.getX()].getChildren().add(creature.getCreatureAnimation()[0]);
+                    creature.prevImage = creature.getCreatureAnimation()[0];
+                    creature.prevX = creature.getX();
+                    creature.prevY = creature.getY();
+                }
+            }
+        }
+    }
+
+    public void handleGhiniMovement(String map){
+        toMove.get(EAST).clear(); toMove.get(WEST).clear();
+        for (Integer i : mobs.keySet()){
+            for (Integer j : mobs.get(i).keySet()){
+                for (Creature creature : mobs.get(i).get(j)){
+                    if (creature instanceof Ghini && !((Ghini) creature).push)
+                        toMove.get(creature.moveCycle.get(creature.i)).add(creature);
+                }
+            }
+        }
+
+        for (MoveDirection direction : toMove.keySet()){
+            for (Creature creature : toMove.get(direction)){
+                if (creature instanceof Ghini){
+                    if (creature.prevImage != null)
+                        nodes[creature.prevY][creature.prevX].getChildren().remove(creature.prevImage);
+
+                    creature.move(AbstractMap.maps.get(map), direction);
+                    creature.i += 1;
+
+                    if (creature.getHealth() > 0)
+                        nodes[creature.getY()][creature.getX()].getChildren().add(creature.getCreatureAnimation()[0]);
+                    creature.prevImage = creature.getCreatureAnimation()[0];
+                    creature.prevX = creature.getX();
+                    creature.prevY = creature.getY();
+                    if (creature.i == creature.moveCycle.size()) creature.i = 0;
+                }
+            }
+        }
+    }
+
+    public void checkIfInContainer(int x, int y){
+        if(!this.mobs.containsKey(y))
+            this.mobs.put(y, new LinkedHashMap<>());
+        if (!this.mobs.get(y).containsKey(x))
+            this.mobs.get(y).put(x, new ArrayList<>());
+    }
+
+    public void handleZolaMovement(String map){
+        if (this.zola != null && !zola.ballPushed){
+            if (this.zola.prevImage != null){
+                this.mobs.get(this.zola.prevY).get(this.zola.prevX).remove(this.zola);
+                nodes[this.zola.prevY][this.zola.prevX].getChildren().remove(this.zola.prevImage);
+
+                this.checkIfInContainer(this.zola.position.getX(), this.zola.position.getY());
+                this.mobs.get(this.zola.position.getY()).get(this.zola.position.getX()).add(this.zola);
+            }
+
+            if (zolaCnt % 3 == 2) {
+                zola.prevX = zola.getX();
+                zola.prevY = zola.getY();
+                if (!this.zola.ballPushed){
+                    this.zolaAttackBall = new ZolaAttackBall(this.zola.getPosition(), this.zola.getPosition(), hero.getPosition());
+                    this.zola.ballPushed = true;
+                }
+                if (ThreadLocalRandom.current().nextInt(0, 2) == 1)
+                    this.zola.move(AbstractMap.maps.get(map), NORTH);
+                else
+                    this.zola.move(AbstractMap.maps.get(map), SOUTH);
+
+            }
+            else{
+                if (zola.position == null){
+                    int index = zolaPositions.get(ThreadLocalRandom.current().nextInt(0, zolaPositions.size()));
+                    zola.position = new Vector2d(index % AbstractMap.width, index / AbstractMap.width);
+                    checkIfInContainer(zola.position.getX(), zola.position.getY());
+                    this.mobs.get(zola.position.getY()).get(zola.position.getX()).add(zola);
+                }
+                if (zola.getHealth() > 0)
+                    nodes[zola.getY()][zola.getX()].getChildren().add(zola.getCreatureAnimation()[zolaCnt % 3]);
+                this.zola.prevImage = zola.getCreatureAnimation()[zolaCnt % 3];
+                zola.prevX = zola.getX();
+                zola.prevY = zola.getY();
+            }
+
+            zolaCnt += 1;
+        }
+    }
+
+    public void handleZolaAttack(String map){
+        AbstractMap currMap = AbstractMap.maps.get(map);
+        if (currMap.zolaAttackBall != null){
+            currMap.nodes[currMap.zolaAttackBall.position.getY()][currMap.zolaAttackBall.position.getX()].getChildren().remove(currMap.zolaAttackBall.getAttackBallImage());
+
+            Vector2d newPos;
+
+            newPos = currMap.zolaAttackBall.getNewBallPosition(currMap.zolaAttackBall.position.getX() - 1);
+
+            if (newPos.follows(lowerLeft) && newPos.precedes(upperRight))
+                currMap.nodes[newPos.getY()][newPos.getX()].getChildren().add(currMap.zolaAttackBall.getAttackBallImage());
+            else{
+                currMap.zolaAttackBall = null;
+                if (this.zola != null)
+                    this.zola.ballPushed = false;
+            }
+        }
+    }
+
+    public void handleTektiteMovement(String map){
+        if (tektiteCnt % 2 == 0){
+            toMove.get(SOUTH).clear(); toMove.get(NORTH).clear(); toMove.get(EAST).clear(); toMove.get(WEST).clear();
+            toMove.get(NORTH_EAST).clear(); toMove.get(NORTH_WEST).clear(); toMove.get(SOUTH_EAST).clear(); toMove.get(SOUTH_WEST).clear();
+            for (Integer i : mobs.keySet()){
+                for (Integer j : mobs.get(i).keySet()){
+                    for (Creature creature : mobs.get(i).get(j)){
+                        if (creature instanceof Tektite)
+                            toMove.get(creature.moveCycle.get(creature.i)).add(creature);
+                    }
+                }
+            }
+        }
+
+        for (MoveDirection direction : toMove.keySet()){
+            for (Creature creature : toMove.get(direction)){
+                if (creature.prevImage != null)
+                    nodes[creature.prevY][creature.prevX].getChildren().remove(creature.prevImage);
+                if (tektiteCnt % 2 == 0){
+                    if (creature.getOrientation() == direction)
+                        creature.move(AbstractMap.maps.get(map), direction);
+                    creature.move(AbstractMap.maps.get(map), direction);
+                    creature.i += 1;
+                }
+                if (creature.getHealth() > 0)
+                    nodes[creature.getY()][creature.getX()].getChildren().add(creature.getCreatureAnimation()[tektiteCnt % 2]);
+                creature.prevImage = creature.getCreatureAnimation()[tektiteCnt % 2];
+                creature.prevX = creature.getX();
+                creature.prevY = creature.getY();
+                if (creature.i == creature.moveCycle.size()) creature.i = 0;
+            }
+        }
+
+        tektiteCnt += 1;
     }
 
     public static boolean collidesWithHero(Vector2d position){

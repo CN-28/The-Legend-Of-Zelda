@@ -4,7 +4,11 @@ public enum MoveDirection {
     NORTH,
     WEST,
     EAST,
-    SOUTH;
+    SOUTH,
+    NORTH_EAST,
+    NORTH_WEST,
+    SOUTH_WEST,
+    SOUTH_EAST;
 
     public String toString(){
         return switch (this) {
@@ -12,6 +16,10 @@ public enum MoveDirection {
             case SOUTH -> "South";
             case WEST -> "West";
             case EAST -> "East";
+            case NORTH_EAST -> "NorthEast";
+            case SOUTH_EAST -> "SouthEast";
+            case NORTH_WEST -> "NorthWest";
+            case SOUTH_WEST -> "SouthWest";
         };
     }
 
@@ -21,6 +29,10 @@ public enum MoveDirection {
             case SOUTH -> new Vector2d(0, 1);
             case WEST -> new Vector2d(-1, 0);
             case EAST -> new Vector2d(1, 0);
+            case SOUTH_WEST -> new Vector2d(-1, 1);
+            case NORTH_WEST -> new Vector2d(-1, -1);
+            case SOUTH_EAST -> new Vector2d(1, 1);
+            case NORTH_EAST -> new Vector2d(1, -1);
         };
     }
 
@@ -30,15 +42,10 @@ public enum MoveDirection {
             case WEST -> EAST;
             case EAST -> WEST;
             case SOUTH -> NORTH;
-        };
-    }
-
-    public MoveDirection next(){
-        return switch (this) {
-            case NORTH -> EAST;
-            case EAST -> SOUTH;
-            case SOUTH -> WEST;
-            case WEST -> NORTH;
+            case NORTH_EAST -> SOUTH_WEST;
+            case SOUTH_EAST -> NORTH_WEST;
+            case NORTH_WEST -> SOUTH_EAST;
+            case SOUTH_WEST -> NORTH_EAST;
         };
     }
 }

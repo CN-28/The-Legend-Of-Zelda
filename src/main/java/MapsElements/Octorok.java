@@ -1,25 +1,21 @@
 package MapsElements;
 
+import GUI.App;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 import static MapsElements.MoveDirection.*;
 
 public class Octorok extends Creature {
     private static final HashMap<MoveDirection, Image[]> images = new HashMap<>();
     private final HashMap<MoveDirection, ImageView[]> imageViews = new HashMap<>();
-    public final ArrayList<MoveDirection> moveCycle = new ArrayList<>();
     public boolean ballPushed = false;
     public OctorokAttackBall ball;
-    public int i, prevX, prevY;
-    public ImageView prevImage;
     static {
         images.put(SOUTH, new Image[2]); images.put(EAST, new Image[2]); images.put(WEST, new Image[2]); images.put(NORTH, new Image[2]);
         try {
@@ -48,19 +44,12 @@ public class Octorok extends Creature {
         this.moveCycle.addAll(Arrays.asList(moves));
     }
 
-    public void move(AbstractMap map, MoveDirection direction){
-        if (direction == this.orientation){
-            Vector2d newPos = this.position.add(this.orientation.toUnitVector());
-            if (map.canMoveTo(newPos)){
-                EastMap.octoroks.get(this.position.getY()).remove(this.position.getX());
-                if (!EastMap.octoroks.containsKey(newPos.getY()))
-                    EastMap.octoroks.put(newPos.getY(), new LinkedHashMap<>());
-                EastMap.octoroks.get(newPos.getY()).put(newPos.getX(), this);
-                this.position = newPos;
-            }
-        }
-        else
-            this.orientation = direction;
+    public void removeCreature(){
+        if (this.ballPushed)
+            App.map.octoroksBalls.add(this.ball);
+        App.map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[0]);
+        App.map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[1]);
+        App.map.mobs.get(this.getY()).get(this.getX()).remove(this);
     }
 
     public boolean sees(Vector2d position){
@@ -68,7 +57,7 @@ public class Octorok extends Creature {
                 || this.position.getX() == position.getX() && (this.position.getY() < position.getY() && this.orientation == SOUTH || this.position.getY() > position.getY() && this.orientation == NORTH);
     }
 
-    public ImageView[] getOctorokAnimation(){
+    public ImageView[] getCreatureAnimation(){
         return imageViews.get(this.orientation);
     }
 }

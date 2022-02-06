@@ -1,7 +1,11 @@
 package MapsElements;
 
+import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
+
+import static MapsElements.MoveDirection.*;
+import static MapsElements.MoveDirection.WEST;
 
 public class SouthMap extends AbstractMap {
     public static final Vector2d upperLeftPassageBorder = new Vector2d(2 * width/5 + 1, -1);
@@ -59,7 +63,30 @@ public class SouthMap extends AbstractMap {
                 this.grid.add(this.nodes[i][j], j, i);
             }
         }
+
+        animation = new AnimationTimer() {
+            public void handle(long now) {
+                if (frameCount % 6 == 0)
+                    handleOctorokBallsAttacks("South");
+
+                if (frameCount % 8 == 0)
+                    handleOctorokMovement("South");
+
+                if (frameCount % 12 == 0)
+                    handleTektiteMovement("South");
+
+                if (frameCount == 96)
+                    frameCount = 0;
+
+                frameCount += 1;
+            }
+        };
+
+        addOctorok(10, 7, new MoveDirection[]{SOUTH, SOUTH, SOUTH, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST, NORTH, NORTH,
+                NORTH, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST});
+        addTektite(15, 16, new MoveDirection[]{EAST, EAST, NORTH_WEST, NORTH_WEST, SOUTH, SOUTH});
     }
+
 
     public boolean canMoveTo(Vector2d position){
         if (super.canMoveTo(position)) return true;

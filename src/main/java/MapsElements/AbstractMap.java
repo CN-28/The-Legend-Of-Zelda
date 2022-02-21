@@ -20,11 +20,12 @@ import static MapsElements.MoveDirection.NORTH;
 public abstract class AbstractMap implements IWorldMap {
     public static Image grassTile, sandTile, waterTile, waterEdgeTile, pathTile, sandBarrierUpperRightCornerTile, sandBarrierBottomRightCornerTile,
     sandBarrierTile, bottomLeftSandTreeTile, upperLeftSandTreeTile, upperMiddleSandTreeTile, bottomMiddleSandTreeTile, bottomRightSandTreeTile, upperRightSandTreeTile,
-    sandBlockerTile, sandSphereTile, upperRightWaterTile, upperRightWaterCornerTile, bottomRightWaterCornerTile, blackTile, sandBarrierUpperLeftCornerTile,
+    sandBlockerTile, sandSphereTile, upperRightWaterTile, upperRightWaterCornerTile, bottomRightWaterCornerTile, sandBarrierUpperLeftCornerTile,
     sandBarrierBottomLeftCornerTile, grassBarrierUpperRightCornerTile, grassBarrierBottomRightCornerTile, grassBarrierTile, grassSphereTile, bottomLeftGrassTreeTile,
     upperLeftGrassTreeTile, upperRightGrassTreeTile, bottomRightGrassTreeTile, grassBlockerTile, grassStatueTile, grassBarrierBottomLeftCornerTile, grayBarrierUpperRightCornerTile,
     grayBarrierTile, grayTile, graySphereTile, grayHiddenCave, grassBarrierUpperLeftCornerTile, grayBarrierBottomRightCornerTile, grayBarrierUpperLeftCornerTile, bottomLeftGrayTreeTile,
-    upperLeftGrayTreeTile, upperMiddleGrayTreeTile, bottomMiddleGrayTreeTile, upperRightGrayTreeTile, bottomRightGrayTreeTile;
+    upperLeftGrayTreeTile, upperMiddleGrayTreeTile, bottomMiddleGrayTreeTile, upperRightGrayTreeTile, bottomRightGrayTreeTile, bomb, bigHeart, heart, healthPotion,
+    gold;
     protected static int size = 35;
     protected int frameCount = 0;
     protected static IMapChangeObserver MapChangeObserver;
@@ -71,7 +72,6 @@ public abstract class AbstractMap implements IWorldMap {
             upperRightWaterTile = new Image(new FileInputStream("src/main/resources/upperRightWaterTile.png"), size, size, false, false);
             upperRightWaterCornerTile = new Image(new FileInputStream("src/main/resources/upperRightCornerTile.png"), size, size, false, false);
             bottomRightWaterCornerTile = new Image(new FileInputStream("src/main/resources/bottomRightCornerTile.png"), size, size, false, false);
-            blackTile = new Image(new FileInputStream("src/main/resources/blackTile.png"), size, size, false, false);
             sandBarrierUpperLeftCornerTile = new Image(new FileInputStream("src/main/resources/sandBarrierUpperLeftCorner.png"), size, size, false, false);
             sandBarrierBottomLeftCornerTile = new Image(new FileInputStream("src/main/resources/sandBarrierBottomLeftCorner.png"), size, size, false, false);
             grassBarrierUpperRightCornerTile = new Image(new FileInputStream("src/main/resources/grassBarrierUpperRightCorner.png"), size, size, false, false);
@@ -99,6 +99,11 @@ public abstract class AbstractMap implements IWorldMap {
             bottomMiddleGrayTreeTile = new Image(new FileInputStream("src/main/resources/bottomMiddleGrayTree.png"), size, size, false, false);
             upperRightGrayTreeTile = new Image(new FileInputStream("src/main/resources/upperRightGrayTree.png"), size, size, false, false);
             bottomRightGrayTreeTile = new Image(new FileInputStream("src/main/resources/bottomRightGrayTree.png"), size, size, false, false);
+            bomb = new Image(new FileInputStream("src/main/resources/bomb.png"), size, size, false, false);
+            bigHeart = new Image(new FileInputStream("src/main/resources/bigHeart.png"), size, size, false, false);
+            heart = new Image(new FileInputStream("src/main/resources/heart.png"), size, size, false, false);
+            gold = new Image(new FileInputStream("src/main/resources/gold.png"), size, size, false, false);
+            healthPotion = new Image(new FileInputStream("src/main/resources/healthPotion.png"), size, size, false, false);
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }
@@ -172,8 +177,9 @@ public abstract class AbstractMap implements IWorldMap {
                                 nodes[tempPos.getY()][tempPos.getX()].getChildren().add(octorok.ball.getAttackBallImage());
                             }
                             else {
-                                if(AbstractMap.collidesWithHero(tempPos))
+                                if(AbstractMap.collidesWithHero(tempPos) && App.map.equals(AbstractMap.maps.get(map)))
                                     hero.removeHealth(1);
+
                                 octorok.ballPushed = false;
                                 nodes[octorok.ball.ballPosition.getY()][octorok.ball.ballPosition.getX()].getChildren().remove(octorok.ball.getAttackBallImage());
                             }
@@ -341,9 +347,12 @@ public abstract class AbstractMap implements IWorldMap {
 
             newPos = currMap.zolaAttackBall.getNewBallPosition(currMap.zolaAttackBall.position.getX() - 1);
 
-            if (newPos.follows(lowerLeft) && newPos.precedes(upperRight))
+            if (newPos.follows(lowerLeft) && newPos.precedes(upperRight) && !collidesWithHero(newPos))
                 currMap.nodes[newPos.getY()][newPos.getX()].getChildren().add(currMap.zolaAttackBall.getAttackBallImage());
             else{
+                if (currMap.equals(App.map) && collidesWithHero(newPos))
+                    hero.removeHealth(1);
+
                 currMap.zolaAttackBall = null;
                 if (this.zola != null)
                     this.zola.ballPushed = false;

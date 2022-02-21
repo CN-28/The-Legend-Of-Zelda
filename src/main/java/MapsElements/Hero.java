@@ -10,12 +10,21 @@ import static MapsElements.MoveDirection.*;
 public class Hero extends Creature {
     private static final HashMap<MoveDirection, ImageView[]> attackImageViews = new HashMap<>();
     private static final HashMap<MoveDirection, ImageView> basicImageViews = new HashMap<>();
+    private static final HashMap<MoveDirection, ImageView> woodenSwordImageViews = new HashMap<>();
+    private static final HashMap<MoveDirection, ImageView> whiteSwordImageViews = new HashMap<>();
+    public static int maxHealth;
     static {
-        attackImageViews.put(SOUTH, new ImageView[8]);
-        attackImageViews.put(EAST, new ImageView[8]);
-        attackImageViews.put(WEST, new ImageView[8]);
-        attackImageViews.put(NORTH, new ImageView[8]);
+        attackImageViews.put(SOUTH, new ImageView[8]); attackImageViews.put(EAST, new ImageView[8]);
+        attackImageViews.put(WEST, new ImageView[8]); attackImageViews.put(NORTH, new ImageView[8]);
         try {
+            woodenSwordImageViews.put(SOUTH, new ImageView(new Image(new FileInputStream("src/main/resources/woodenSwordWholeBot.png"), size, size, false, false)));
+            woodenSwordImageViews.put(NORTH, new ImageView(new Image(new FileInputStream("src/main/resources/woodenSword.png"), size, size, false, false)));
+            woodenSwordImageViews.put(WEST, new ImageView(new Image(new FileInputStream("src/main/resources/woodenSwordLeft.png"), size, size, false, false)));
+            woodenSwordImageViews.put(EAST, new ImageView(new Image(new FileInputStream("src/main/resources/woodenSwordRight.png"), size, size, false, false)));
+            whiteSwordImageViews.put(SOUTH, new ImageView(new Image(new FileInputStream("src/main/resources/whiteSwordWholeBot.png"), size, size, false, false)));
+            whiteSwordImageViews.put(NORTH, new ImageView(new Image(new FileInputStream("src/main/resources/whiteSword.png"), size, size, false, false)));
+            whiteSwordImageViews.put(WEST, new ImageView(new Image(new FileInputStream("src/main/resources/whiteSwordLeft.png"), size, size, false, false)));
+            whiteSwordImageViews.put(EAST, new ImageView(new Image(new FileInputStream("src/main/resources/whiteSwordRight.png"), size, size, false, false)));
             basicImageViews.put(SOUTH, new ImageView(new Image(new FileInputStream("src/main/resources/frontHero.png"), size, size, false, false)));
             basicImageViews.put(EAST, new ImageView(new Image(new FileInputStream("src/main/resources/rightHero.png"), size, size, false, false)));
             basicImageViews.put(WEST, new ImageView(new Image(new FileInputStream("src/main/resources/leftHero.png"), size, size, false, false)));
@@ -48,7 +57,6 @@ public class Hero extends Creature {
             attackImageViews.get(NORTH)[5] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp3_2.png"), size, size, false, false));
             attackImageViews.get(NORTH)[6] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp4_1.png"), size, size, false, false));
             attackImageViews.get(NORTH)[7] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp4_2.png"), size, size, false, false));
-
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }
@@ -56,7 +64,8 @@ public class Hero extends Creature {
 
     public Hero() {
         this.position = new Vector2d(14, 9);
-        this.health = 10;
+        this.health = 16;
+        maxHealth = this.health;
         this.orientation = SOUTH;
     }
 
@@ -89,6 +98,10 @@ public class Hero extends Creature {
 
     public void removeCreature(){
 
+    }
+
+    public ImageView getSwordPicture(MoveDirection dir){
+        return woodenSwordImageViews.get(dir);
     }
 
     public ImageView getPicture(){

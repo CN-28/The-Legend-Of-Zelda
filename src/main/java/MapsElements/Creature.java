@@ -41,6 +41,10 @@ public abstract class Creature {
         return this.position;
     }
 
+    public void setPosition(int x, int y){
+        this.position = new Vector2d(x, y);
+    }
+
     public MoveDirection getOrientation(){
         return this.orientation;
     }

@@ -49,8 +49,10 @@ public abstract class Creature {
         return this.orientation;
     }
 
-    public void removeHealth(int attackPower){
+    public void removeHealth(AbstractMap map, int attackPower){
         this.health -= attackPower;
+        if (this.health <= 0)
+            removeCreature(map);
     }
 
     public int getHealth(){
@@ -65,7 +67,7 @@ public abstract class Creature {
         return this.position.getY();
     }
 
-    public abstract void removeCreature();
+    public abstract void removeCreature(AbstractMap map);
 
     public abstract ImageView[] getCreatureAnimation();
 }

@@ -1,6 +1,5 @@
 package MapsElements;
 
-import GUI.App;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -44,12 +43,12 @@ public class Octorok extends Creature {
         this.moveCycle.addAll(Arrays.asList(moves));
     }
 
-    public void removeCreature(){
+    public void removeCreature(AbstractMap map){
         if (this.ballPushed)
-            App.map.octoroksBalls.add(this.ball);
-        App.map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[0]);
-        App.map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[1]);
-        App.map.mobs.get(this.getY()).get(this.getX()).remove(this);
+            map.octoroksBalls.add(this.ball);
+        map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[0]);
+        map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[1]);
+        map.mobs.get(this.getY()).get(this.getX()).remove(this);
     }
 
     public boolean sees(Vector2d position){

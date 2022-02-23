@@ -1,6 +1,5 @@
 package MapsElements;
 
-import GUI.App;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -30,10 +29,10 @@ public class Tektite extends Creature {
         this.moveCycle.addAll(Arrays.asList(moves));
     }
 
-    public void removeCreature() {
-        App.map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[0]);
-        App.map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[1]);
-        App.map.mobs.get(this.getY()).get(this.getX()).remove(this);
+    public void removeCreature(AbstractMap map) {
+        map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[0]);
+        map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[1]);
+        map.mobs.get(this.getY()).get(this.getX()).remove(this);
     }
 
     public ImageView[] getCreatureAnimation(){

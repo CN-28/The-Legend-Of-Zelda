@@ -1,6 +1,5 @@
 package MapsElements;
 
-import GUI.App;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -32,7 +31,7 @@ public class Manhandla extends Creature {
 
     public Manhandla(int x, int y, MoveDirection[] moves){
         this.position = new Vector2d(x, y);
-        this.topHealth = 3; this.rightHealth = 3; this.botHealth = 3; this.leftHealth = 3;
+        this.topHealth = 4; this.rightHealth = 4; this.botHealth = 4; this.leftHealth = 4;
         this.moveCycle.addAll(Arrays.asList(moves));
         this.topAlive = true; this.rightAlive = true; this.botAlive = true; this.leftAlive = true;
         this.leftAttacking = false; this.topAttacking = false; this.rightAttacking = false; this.botAttacking = false;
@@ -53,52 +52,52 @@ public class Manhandla extends Creature {
             case "top" -> {
                 this.topHealth -= attackPower;
                 if (this.topHealth <= 0)
-                    removeCreature();
+                    removeCreature(AbstractMap.maps.get("NorthWest"));
             }
             case "right" -> {
                 this.rightHealth -= attackPower;
                 if (this.rightHealth <= 0)
-                    removeCreature();
+                    removeCreature(AbstractMap.maps.get("NorthWest"));
             }
             case "bot" -> {
                 this.botHealth -= attackPower;
                 if (this.botHealth <= 0)
-                    removeCreature();
+                    removeCreature(AbstractMap.maps.get("NorthWest"));
             }
             case "left" -> {
                 this.leftHealth -= attackPower;
                 if (this.leftHealth <= 0)
-                    removeCreature();
+                    removeCreature(AbstractMap.maps.get("NorthWest"));
             }
         }
     }
 
-    public void removeCreature(){
+    public void removeCreature(AbstractMap map){
         int y = NorthWestMap.boss.position.getY(); int x = NorthWestMap.boss.position.getX();
         if (this.topHealth <= 0 && this.topAlive){
             this.topAlive = false;
-            App.map.nodes[y - 1][x].getChildren().remove(getCreatureAnimation()[1]);
-            App.map.nodes[y - 1][x].getChildren().remove(getCreatureAnimation()[5]);
+            map.nodes[y - 1][x].getChildren().remove(getCreatureAnimation()[1]);
+            map.nodes[y - 1][x].getChildren().remove(getCreatureAnimation()[5]);
         }
         else if (this.rightHealth <= 0 && this.rightAlive){
             this.rightAlive = false;
-            App.map.nodes[y][x + 1].getChildren().remove(getCreatureAnimation()[2]);
-            App.map.nodes[y][x + 1].getChildren().remove(getCreatureAnimation()[6]);
+            map.nodes[y][x + 1].getChildren().remove(getCreatureAnimation()[2]);
+            map.nodes[y][x + 1].getChildren().remove(getCreatureAnimation()[6]);
         }
         else if (this.botHealth <= 0 && this.botAlive){
             this.botAlive = false;
-            App.map.nodes[y + 1][x].getChildren().remove(getCreatureAnimation()[3]);
-            App.map.nodes[y + 1][x].getChildren().remove(getCreatureAnimation()[7]);
+            map.nodes[y + 1][x].getChildren().remove(getCreatureAnimation()[3]);
+            map.nodes[y + 1][x].getChildren().remove(getCreatureAnimation()[7]);
         }
         else if (this.leftHealth <= 0 && this.leftAlive){
             this.leftAlive = false;
-            App.map.nodes[y][x - 1].getChildren().remove(getCreatureAnimation()[4]);
-            App.map.nodes[y][x - 1].getChildren().remove(getCreatureAnimation()[8]);
+            map.nodes[y][x - 1].getChildren().remove(getCreatureAnimation()[4]);
+            map.nodes[y][x - 1].getChildren().remove(getCreatureAnimation()[8]);
         }
 
         if (!this.leftAlive && !this.topAlive && !this.rightAlive && !this.botAlive){
             NorthWestMap.boss = null;
-            App.map.nodes[y][x].getChildren().remove(getCreatureAnimation()[0]);
+            map.nodes[y][x].getChildren().remove(getCreatureAnimation()[0]);
         }
     }
 

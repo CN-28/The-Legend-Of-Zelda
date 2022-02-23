@@ -1,6 +1,5 @@
 package MapsElements;
 
-import GUI.App;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -35,8 +34,8 @@ public class Ghini extends Creature {
         this.moveCycle.addAll(Arrays.asList(moves));
     }
 
-    public void removeHealth(int attackPower){
-        super.removeHealth(attackPower);
+    public void removeHealth(AbstractMap map, int attackPower){
+        super.removeHealth(map, attackPower);
         if (this.health > 0){
             this.pushCnt = 4;
             this.push = true;
@@ -48,9 +47,9 @@ public class Ghini extends Creature {
         changeCreaturePosition(map, newPos);
     }
 
-    public void removeCreature() {
-        App.map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[0]);
-        App.map.mobs.get(this.getY()).get(this.getX()).remove(this);
+    public void removeCreature(AbstractMap map) {
+        map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[0]);
+        map.mobs.get(this.getY()).get(this.getX()).remove(this);
     }
 
     public ImageView[] getCreatureAnimation() {

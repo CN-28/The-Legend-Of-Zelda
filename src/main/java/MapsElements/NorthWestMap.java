@@ -161,7 +161,7 @@ public class NorthWestMap extends AbstractMap {
             ManhandlaAttackBall ball = iter.next();
             if (!(ball.position.precedes(upperRight) && ball.position.follows(lowerLeft)) || isOccupied(ball.position) || collidesWithHero(ball.position)){
                 if (collidesWithHero(ball.position))
-                    hero.removeHealth(1);
+                    hero.removeHealth(this, 1);
 
                 if (boss != null){
                     switch (ball.direction){

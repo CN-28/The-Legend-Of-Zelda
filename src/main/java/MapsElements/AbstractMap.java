@@ -178,7 +178,7 @@ public abstract class AbstractMap implements IWorldMap {
                             }
                             else {
                                 if(AbstractMap.collidesWithHero(tempPos) && App.map.equals(AbstractMap.maps.get(map)))
-                                    hero.removeHealth(1);
+                                    hero.removeHealth(App.map,1);
 
                                 octorok.ballPushed = false;
                                 nodes[octorok.ball.ballPosition.getY()][octorok.ball.ballPosition.getX()].getChildren().remove(octorok.ball.getAttackBallImage());
@@ -351,7 +351,7 @@ public abstract class AbstractMap implements IWorldMap {
                 currMap.nodes[newPos.getY()][newPos.getX()].getChildren().add(currMap.zolaAttackBall.getAttackBallImage());
             else{
                 if (currMap.equals(App.map) && collidesWithHero(newPos))
-                    hero.removeHealth(1);
+                    hero.removeHealth(App.map, 1);
 
                 currMap.zolaAttackBall = null;
                 if (this.zola != null)
@@ -398,6 +398,18 @@ public abstract class AbstractMap implements IWorldMap {
 
     public static boolean collidesWithHero(Vector2d position){
         return position.equals(hero.getPosition());
+    }
+
+    public boolean mobCollidesWithHero(){
+        return mobs.containsKey(hero.getY()) && mobs.get(hero.getY()).containsKey(hero.getX()) && mobs.get(hero.getY()).get(hero.getX()).size() > 0
+                || this instanceof NorthWestMap && NorthWestMap.boss != null && heroCollidesWithBoss();
+    }
+
+    private boolean heroCollidesWithBoss(){
+        Vector2d bossPos = NorthWestMap.boss.getPosition();
+        return hero.getPosition().equals(bossPos.add(WEST.toUnitVector())) || hero.getPosition().equals(bossPos.add(EAST.toUnitVector())) ||
+                hero.getPosition().equals(bossPos.add(NORTH.toUnitVector())) || hero.getPosition().equals(bossPos.add(SOUTH.toUnitVector()))
+                || hero.getPosition().equals(bossPos);
     }
 
     public boolean isOccupied(Vector2d position){

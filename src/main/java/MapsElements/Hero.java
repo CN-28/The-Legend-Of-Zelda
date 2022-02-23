@@ -12,11 +12,16 @@ public class Hero extends Creature {
     private static final HashMap<MoveDirection, ImageView> basicImageViews = new HashMap<>();
     private static final HashMap<MoveDirection, ImageView> woodenSwordImageViews = new HashMap<>();
     private static final HashMap<MoveDirection, ImageView> whiteSwordImageViews = new HashMap<>();
+    private static final Image[] bombImages = new Image[4];
     public static int maxHealth;
     static {
         attackImageViews.put(SOUTH, new ImageView[8]); attackImageViews.put(EAST, new ImageView[8]);
         attackImageViews.put(WEST, new ImageView[8]); attackImageViews.put(NORTH, new ImageView[8]);
         try {
+            bombImages[0] = new Image(new FileInputStream("src/main/resources/bomb.png"), size, size, false, false);
+            bombImages[1] = new Image(new FileInputStream("src/main/resources/bombExplosion1.png"), size, size, false, false);
+            bombImages[2] = new Image(new FileInputStream("src/main/resources/bombExplosion2.png"), size, size, false, false);
+            bombImages[3] = new Image(new FileInputStream("src/main/resources/bombExplosion3.png"), size, size, false, false);
             woodenSwordImageViews.put(SOUTH, new ImageView(new Image(new FileInputStream("src/main/resources/woodenSwordWholeBot.png"), size, size, false, false)));
             woodenSwordImageViews.put(NORTH, new ImageView(new Image(new FileInputStream("src/main/resources/woodenSword.png"), size, size, false, false)));
             woodenSwordImageViews.put(WEST, new ImageView(new Image(new FileInputStream("src/main/resources/woodenSwordLeft.png"), size, size, false, false)));
@@ -96,7 +101,7 @@ public class Hero extends Creature {
         return null;
     }
 
-    public void removeCreature(){
+    public void removeCreature(AbstractMap map){
 
     }
 
@@ -106,6 +111,10 @@ public class Hero extends Creature {
 
     public ImageView getPicture(){
         return basicImageViews.get(this.orientation);
+    }
+
+    public Image[] getBombImages(){
+        return bombImages;
     }
 
     public ImageView[] getAnimationAttack(){

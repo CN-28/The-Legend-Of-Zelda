@@ -1,6 +1,5 @@
 package MapsElements;
 
-import GUI.App;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -48,18 +47,18 @@ public class Zola extends Creature {
         this.position = new Vector2d(index % AbstractMap.width, index / AbstractMap.width);
     }
 
-    public void removeCreature() {
-        App.map.zola = null;
-        App.map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[2]);
-        App.map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[3]);
+    public void removeCreature(AbstractMap map) {
+        map.zola = null;
+        map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[2]);
+        map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[3]);
         if (this.prevY != -1){
-            App.map.nodes[this.prevY][this.prevX].getChildren().remove(this.getCreatureAnimation()[2]);
-            App.map.nodes[this.prevY][this.prevX].getChildren().remove(this.getCreatureAnimation()[3]);
+            map.nodes[this.prevY][this.prevX].getChildren().remove(this.getCreatureAnimation()[2]);
+            map.nodes[this.prevY][this.prevX].getChildren().remove(this.getCreatureAnimation()[3]);
         }
-        if (App.map.mobs.containsKey(this.getY()) && App.map.mobs.get(this.getY()).containsKey(this.getX()))
-            App.map.mobs.get(this.getY()).get(this.getX()).remove(this);
-        if (prevX != -1 && App.map.mobs.containsKey(this.prevY) && App.map.mobs.get(this.prevY).containsKey(this.prevX))
-            App.map.mobs.get(this.prevY).get(this.prevX).remove(this);
+        if (map.mobs.containsKey(this.getY()) && map.mobs.get(this.getY()).containsKey(this.getX()))
+            map.mobs.get(this.getY()).get(this.getX()).remove(this);
+        if (prevX != -1 && map.mobs.containsKey(this.prevY) && map.mobs.get(this.prevY).containsKey(this.prevX))
+            map.mobs.get(this.prevY).get(this.prevX).remove(this);
     }
 
     public ImageView[] getCreatureAnimation() {

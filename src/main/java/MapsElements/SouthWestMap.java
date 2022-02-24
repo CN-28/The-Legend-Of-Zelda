@@ -4,8 +4,7 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 
-import static MapsElements.MoveDirection.EAST;
-import static MapsElements.MoveDirection.WEST;
+import static MapsElements.MoveDirection.*;
 
 public class SouthWestMap extends AbstractMap {
     public static final Vector2d rightBottomPassageBorder = new Vector2d(width, 2 * height/5);
@@ -70,6 +69,8 @@ public class SouthWestMap extends AbstractMap {
             MapChangeObserver.notifyMapChange(maps.get("South"));
         else if (position.follows(upperLeftPassageBorder) && position.precedes(upperRightPassageBorder))
             MapChangeObserver.notifyMapChange(maps.get("West"));
+        else if (hero.getPosition().equals(AbstractCave.caves.get("SouthWest").getPosition()) && hero.getOrientation() == WEST)
+            MapChangeObserver.notifyMapChange(AbstractCave.caves.get("SouthWest"));
 
         return false;
     }

@@ -25,13 +25,13 @@ public abstract class AbstractMap implements IWorldMap {
     upperLeftGrassTreeTile, upperRightGrassTreeTile, bottomRightGrassTreeTile, grassBlockerTile, grassStatueTile, grassBarrierBottomLeftCornerTile, grayBarrierUpperRightCornerTile,
     grayBarrierTile, grayTile, graySphereTile, grayHiddenCave, grassBarrierUpperLeftCornerTile, grayBarrierBottomRightCornerTile, grayBarrierUpperLeftCornerTile, bottomLeftGrayTreeTile,
     upperLeftGrayTreeTile, upperMiddleGrayTreeTile, bottomMiddleGrayTreeTile, upperRightGrayTreeTile, bottomRightGrayTreeTile, bomb, bigHeart, heart, healthPotion,
-    gold;
+    gold, greenLeftStairs, grayLeftStairs;
     protected static int size = 35;
     protected int frameCount = 0;
-    protected static IMapChangeObserver MapChangeObserver;
+    public static IMapChangeObserver MapChangeObserver;
     public static final int width = 30;
     public static final int height = 20;
-    protected final boolean[][] occupancyMap = new boolean[height][width];
+    public final boolean[][] occupancyMap = new boolean[height][width];
     public static final Hero hero = new Hero();
     public static final Vector2d lowerLeft = new Vector2d(0, 0);
     public static final Vector2d upperRight = new Vector2d(width - 1, height - 1);
@@ -104,6 +104,8 @@ public abstract class AbstractMap implements IWorldMap {
             heart = new Image(new FileInputStream("src/main/resources/heart.png"), size, size, false, false);
             gold = new Image(new FileInputStream("src/main/resources/gold.png"), size, size, false, false);
             healthPotion = new Image(new FileInputStream("src/main/resources/healthPotion.png"), size, size, false, false);
+            greenLeftStairs = new Image(new FileInputStream("src/main/resources/greenLeftStairs.png"), size, size, false, false);
+            grayLeftStairs = new Image(new FileInputStream("src/main/resources/grayLeftStairs.png"), size, size, false, false);
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }

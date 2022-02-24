@@ -135,6 +135,8 @@ public class EastMap extends AbstractMap {
             MapChangeObserver.notifyMapChange(maps.get("NorthEast"));
         else if (position.follows(bottomLeftPassageBorder) && position.precedes(bottomRightPassageBorder))
             MapChangeObserver.notifyMapChange(maps.get("SouthEast"));
+        else if (hero.getPosition().equals(AbstractCave.caves.get("East").getPosition()) && hero.getOrientation() == NORTH)
+            MapChangeObserver.notifyMapChange(AbstractCave.caves.get("East"));
 
         return false;
     }

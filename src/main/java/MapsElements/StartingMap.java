@@ -3,6 +3,8 @@ package MapsElements;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 
+import static MapsElements.MoveDirection.*;
+
 public class StartingMap extends AbstractMap {
     public static final Vector2d rightBottomPassageBorder = new Vector2d(width, 2 * height/5);
     public static final Vector2d rightUpperPassageBorder = new Vector2d(width, 3 * height/5 - 1);
@@ -55,7 +57,12 @@ public class StartingMap extends AbstractMap {
             }
         }
         addTree(3, 6); addTree(15, 8); addTree(13, 23); addTree(3, 19);
-        addDecoration(6,6); addDecoration(11,6); addDecoration(4, 22);
+        addDecoration(6,6); addDecoration(10,6); addDecoration(4, 22); renderCave(3, 9);
+    }
+
+    public void renderCave(int x, int y){
+        this.nodes[y][x].getChildren().add(new ImageView(greenLeftStairs));
+        this.occupancyMap[y][x] = false;
     }
 
     public void addTree(int i, int j){
@@ -90,6 +97,8 @@ public class StartingMap extends AbstractMap {
             MapChangeObserver.notifyMapChange(maps.get("South"));
         else if (position.follows(upperLeftPassageBorder) && position.precedes(upperRightPassageBorder))
             MapChangeObserver.notifyMapChange(maps.get("North"));
+        else if (hero.getPosition().equals(AbstractCave.caves.get("Starting").getPosition()) && hero.getOrientation() == WEST)
+            MapChangeObserver.notifyMapChange(AbstractCave.caves.get("Starting"));
 
         return false;
     }

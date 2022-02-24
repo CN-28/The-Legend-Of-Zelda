@@ -29,6 +29,7 @@ public class App extends Application implements IMapChangeObserver {
     public static AnimationTimer attackAnimation, bombAnimation;
     static {
         AbstractMap.getMapsReferences(new StartingMap());
+        AbstractCave.getCavesReferences();
         map = AbstractMap.maps.get("Start");
         for (int i = 0; i < 3; i++){
             for (int j = 0; j < 5; j++)
@@ -180,6 +181,8 @@ public class App extends Application implements IMapChangeObserver {
                 else if (bombIter == 1){
                     bombMap.nodes[bombPos.getY()][bombPos.getX()].getChildren().remove(bombView);
                     addAllExplosions();
+                    checkSecretCaveBombing(AbstractCave.caves.get("East").getPosition(), AbstractMap.maps.get("East"));
+                    checkSecretCaveBombing(AbstractCave.caves.get("SouthWest").getPosition(), AbstractMap.maps.get("SouthWest"));
                     if (bombMap.equals(App.map)) handleDamageToHero();
                     handleBombDamageToNormalCreature();
                     handleBombDamageToBoss();
@@ -195,6 +198,20 @@ public class App extends Application implements IMapChangeObserver {
                 }
 
                 bombIter += 1;
+            }
+
+            private void checkSecretCaveBombing(Vector2d cavePosition, AbstractMap caveMap){
+                int y = cavePosition.getY(); int x = cavePosition.getX();
+                if (App.map.occupancyMap[y][x] && App.map.equals(caveMap) && (bombPos.equals(cavePosition)
+                || bombPos.equals(cavePosition.add(WEST.toUnitVector())) || bombPos.equals(cavePosition.add(NORTH.toUnitVector()))
+                || bombPos.equals(cavePosition.add(SOUTH.toUnitVector())) || bombPos.equals(cavePosition.add(EAST.toUnitVector())))){
+                    App.map.occupancyMap[y][x] = false;
+                    App.map.nodes[y][x].getChildren().clear();
+                    if (caveMap instanceof EastMap)
+                        App.map.nodes[y][x].getChildren().add(new ImageView(InterfaceBar.blackTile));
+                    else
+                        App.map.nodes[y][x].getChildren().add(new ImageView(AbstractMap.grayLeftStairs));
+                }
             }
 
             private void removeAllExplosions(){
@@ -330,7 +347,7 @@ public class App extends Application implements IMapChangeObserver {
                     case DOWN -> moveHero(AbstractMap.hero, SOUTH);
                     case UP -> moveHero(AbstractMap.hero, NORTH);
                     case A -> {
-                        if (!throwAnimation)
+                        if (!throwAnimation && (Hero.hasWoodenSword || Hero.hasWhiteSword))
                             renderAttackAnimation();
                     }
                     case B ->{
@@ -340,6 +357,8 @@ public class App extends Application implements IMapChangeObserver {
                     case H -> useHealthPostion();
                 }
                 ke.consume();
+                if (!Hero.hasWoodenSword && !Hero.hasWhiteSword && App.map instanceof StartingCave && AbstractMap.hero.getPosition().equals(StartingCave.woodenSwordPosition))
+                    StartingCave.doPickUpAnimation();
             }
         });
     }
@@ -393,8 +412,8 @@ public class App extends Application implements IMapChangeObserver {
 
     public void notifyMapChange(AbstractMap newMap){
         root.getChildren().remove(map.grid);
-        map = newMap;
-        root.getChildren().add(map.grid);
+        root.getChildren().add(newMap.grid);
         AbstractMap.hero.setPositionAfterMapChange();
+        map = newMap;
     }
 }

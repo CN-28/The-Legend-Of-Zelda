@@ -16,8 +16,9 @@ public class InterfaceBar {
     public static final Image[] leftNumbers = new Image[10];
     public static final Image[] rightNumbers = new Image[10];
     public static Image blackTile, emptyHeart, halfHeart, twoHearts, oneHeart, oneHalfHearts, lifeBarName1, lifeBarName2, lifeBarName3, attackBarTop, attackBarBot,
-    bombBarBot, bombBarTop, woodSwordTop, woodSwordBot, goldBar, bombBar, bombBot, bombTop, whiteSwordTop, whiteSwordBot, potionBar, healthPotionBarTop,
+    bombBarBot, bombBarTop, goldBar, bombBar, bombBot, bombTop, whiteSwordTop, whiteSwordBot, potionBar, healthPotionBarTop,
     healthPotionBarBot, healthPotionBot, healthPotionTop;
+    public static ImageView woodSwordTop, woodSwordBot;
     static {
         try {
             blackTile = new Image(new FileInputStream("src/main/resources/blackTile.png"), size, size, false, false);
@@ -33,8 +34,8 @@ public class InterfaceBar {
             attackBarBot = new Image(new FileInputStream("src/main/resources/attackBarBot.png"), size, size, false, false);
             bombBarBot = new Image(new FileInputStream("src/main/resources/bombBarBot.png"), size, size, false, false);
             bombBarTop = new Image(new FileInputStream("src/main/resources/bombBarTop.png"), size, size, false, false);
-            woodSwordTop = new Image(new FileInputStream("src/main/resources/woodenSwordTop.png"), size, size, false, false);
-            woodSwordBot = new Image(new FileInputStream("src/main/resources/woodenSwordBot.png"), size, size, false, false);
+            woodSwordTop = new ImageView(new Image(new FileInputStream("src/main/resources/woodenSwordTop.png"), size, size, false, false));
+            woodSwordBot = new ImageView(new Image(new FileInputStream("src/main/resources/woodenSwordBot.png"), size, size, false, false));
             bombBar = new Image(new FileInputStream("src/main/resources/bombBar.png"), size, size, false, false);
             goldBar = new Image(new FileInputStream("src/main/resources/goldBar.png"), size, size, false, false);
             bombTop = new Image(new FileInputStream("src/main/resources/bombTop.png"), size, size, false, false);
@@ -69,14 +70,10 @@ public class InterfaceBar {
                         group.getChildren().add(new ImageView(lifeBarName3));
                 }
                 if (j == 21){
-                    if (i == 0){
+                    if (i == 0)
                         group.getChildren().add(new ImageView(attackBarTop));
-                        group.getChildren().add(new ImageView(woodSwordTop));
-                    }
-                    else{
+                    else
                         group.getChildren().add(new ImageView(attackBarBot));
-                        group.getChildren().add(new ImageView(woodSwordBot));
-                    }
                 }
                 if (j == 23){
                     if (i == 0){

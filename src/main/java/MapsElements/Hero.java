@@ -1,5 +1,6 @@
 package MapsElements;
 
+import GUI.App;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.io.FileInputStream;
@@ -14,6 +15,7 @@ public class Hero extends Creature {
     private static final HashMap<MoveDirection, ImageView> whiteSwordImageViews = new HashMap<>();
     private static final Image[] bombImages = new Image[4];
     public static int maxHealth;
+    public static boolean hasWoodenSword, hasWhiteSword;
     static {
         attackImageViews.put(SOUTH, new ImageView[8]); attackImageViews.put(EAST, new ImageView[8]);
         attackImageViews.put(WEST, new ImageView[8]); attackImageViews.put(NORTH, new ImageView[8]);
@@ -91,10 +93,24 @@ public class Hero extends Creature {
     public void setPositionAfterMapChange() {
         int x = this.getX();
         int y = this.getY();
-        if (x == 0 || x == AbstractMap.width - 1)
+        if (App.map instanceof StartingCave || App.map instanceof EastSecretCave || App.map instanceof SouthWestSecretCave){
+            AbstractCave cave = (AbstractCave) App.map;
+            this.setPosition(cave.getPosition().getX(), cave.getPosition().getY());
+        }
+        else if (x == 0 || x == AbstractMap.width - 1)
             this.setPosition((AbstractMap.width - x - 1) % AbstractMap.width, y);
         else if (y == 0 || y == AbstractMap.height - 1)
             this.setPosition(x, (AbstractMap.height - y - 1) % AbstractMap.height);
+        else if (App.map instanceof StartingMap && this.position.equals(AbstractCave.caves.get("Starting").getPosition()))
+            this.setPosition(AbstractMap.width - 1, this.position.getY());
+        else if (App.map instanceof SouthWestMap && this.position.equals(AbstractCave.caves.get("SouthWest").getPosition()))
+            this.setPosition(AbstractMap.width - 1, this.position.getY() + 3);
+        else if (App.map instanceof EastMap && this.position.equals(AbstractCave.caves.get("East").getPosition()))
+            this.setPosition(EastMap.bottomLeftPassageBorder.getX() + 1, AbstractMap.height - 1);
+        else if (App.map instanceof EastSecretCave){
+            Vector2d temp = AbstractCave.caves.get("East").getPosition();
+            this.setPosition(temp.getX(), temp.getY());
+        }
     }
 
     public ImageView[] getCreatureAnimation(){

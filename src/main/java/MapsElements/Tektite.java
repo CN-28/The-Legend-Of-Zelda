@@ -30,6 +30,7 @@ public class Tektite extends Creature {
     }
 
     public void removeCreature(AbstractMap map) {
+        dropLoot(map, this.position);
         map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[0]);
         map.nodes[this.getY()][this.getX()].getChildren().remove(this.getCreatureAnimation()[1]);
         map.mobs.get(this.getY()).get(this.getX()).remove(this);

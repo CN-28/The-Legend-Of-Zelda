@@ -4,6 +4,7 @@ import GUI.App;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
 import java.io.FileInputStream;
@@ -40,6 +41,7 @@ public abstract class AbstractMap implements IWorldMap {
     public static HashMap<String, AbstractMap> maps = new HashMap<>();
     public AnimationTimer animation;
     protected LinkedHashMap<MoveDirection, ArrayList<Creature>> toMove = new LinkedHashMap<>();
+    public final HashMap<Vector2d, HashMap<Image, ArrayList<ImageView>>> loots = new HashMap<>();
     public final LinkedHashMap<Integer, LinkedHashMap<Integer, ArrayList<Creature>>> mobs = new LinkedHashMap<>();
     public final ArrayList<OctorokAttackBall> octoroksBalls = new ArrayList<>();
     public ZolaAttackBall zolaAttackBall;

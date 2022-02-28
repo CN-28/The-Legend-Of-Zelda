@@ -14,6 +14,7 @@ public class Hero extends Creature {
     private static final HashMap<MoveDirection, ImageView> woodenSwordImageViews = new HashMap<>();
     private static final HashMap<MoveDirection, ImageView> whiteSwordImageViews = new HashMap<>();
     private static final Image[] bombImages = new Image[4];
+    public int bombCnt, healthPotionCnt, goldCnt;
     public static int maxHealth;
     public static boolean hasWoodenSword, hasWhiteSword;
     static {
@@ -84,6 +85,32 @@ public class Hero extends Creature {
         }
         else
             this.orientation = direction;
+    }
+
+    public void pickUpItems(AbstractMap map){
+        if (map.loots.containsKey(this.position)){
+            for (Image image : map.loots.get(this.position).keySet()){
+                for (ImageView imageView : map.loots.get(this.position).get(image)){
+                    if (AbstractMap.bomb.equals(image)){
+                        bombCnt += 1;
+                        InterfaceBar.updateBombCounter(bombCnt);
+                    }
+                    else if (AbstractMap.gold.equals(image)){
+                        goldCnt += 1;
+                        InterfaceBar.updateGoldCounter(goldCnt);
+                    }
+                    else if (AbstractMap.healthPotion.equals(image)){
+                        healthPotionCnt += 1;
+                        InterfaceBar.updateHealthPotionCounter(healthPotionCnt);
+                    }
+                    else if (AbstractMap.heart.equals(image))
+                        InterfaceBar.regenerateOneHeart();
+
+                    map.nodes[this.position.getY()][this.position.getX()].getChildren().remove(imageView);
+                }
+            }
+            map.loots.get(this.position).clear();
+        }
     }
 
     public void setPosition(int x, int y) {

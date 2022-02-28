@@ -15,7 +15,7 @@ import java.util.Iterator;
 
 public class App extends Application implements IMapChangeObserver {
     protected static Scene scene;
-    public InterfaceBar interfaceBar = new InterfaceBar();
+    public static InterfaceBar interfaceBar = new InterfaceBar();
     public static AbstractMap map;
     public static final VBox root = new VBox();
     protected static ImageView[] attackViews;
@@ -367,6 +367,7 @@ public class App extends Application implements IMapChangeObserver {
         this.removeHeroPic();
         hero.move(map, direction);
         this.renderHeroPic();
+        hero.pickUpItems(map);
     }
 
     private void collidesWithBoss(Vector2d position, int attackPower){

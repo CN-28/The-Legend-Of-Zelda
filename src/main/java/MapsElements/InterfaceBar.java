@@ -8,6 +8,7 @@ import javafx.scene.layout.GridPane;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 public class InterfaceBar {
     public static int size = 35;
@@ -15,6 +16,9 @@ public class InterfaceBar {
     public static final Group[][] nodes = new Group[2][AbstractMap.width];
     public static final Image[] leftNumbers = new Image[10];
     public static final Image[] rightNumbers = new Image[10];
+    public static final ArrayList<ImageView> bombCntImageViews = new ArrayList<>();
+    public static final ArrayList<ImageView> goldCntImageViews = new ArrayList<>();
+    public static final ArrayList<ImageView> healthPotionCntImageViews = new ArrayList<>();
     public static Image blackTile, emptyHeart, halfHeart, twoHearts, oneHeart, oneHalfHearts, lifeBarName1, lifeBarName2, lifeBarName3, attackBarTop, attackBarBot,
     bombBarBot, bombBarTop, goldBar, bombBar, bombBot, bombTop, whiteSwordTop, whiteSwordBot, potionBar, healthPotionBarTop,
     healthPotionBarBot, healthPotionBot, healthPotionTop;
@@ -100,8 +104,11 @@ public class InterfaceBar {
                         group.getChildren().add(new ImageView(potionBar));
                 }
                 if (j == 16){
-                    if (i == 0)
-                        group.getChildren().add(new ImageView(leftNumbers[0]));
+                    if (i == 0){
+                        ImageView temp = new ImageView(leftNumbers[0]);
+                        group.getChildren().add(temp);
+                        healthPotionCntImageViews.add(temp);
+                    }
                 }
                 if (j == 18){
                     if (i == 0)
@@ -109,8 +116,13 @@ public class InterfaceBar {
                     else
                         group.getChildren().add(new ImageView(bombBar));
                 }
-                if (j == 19)
-                    group.getChildren().add(new ImageView(leftNumbers[0]));
+                if (j == 19){
+                    ImageView temp = new ImageView(leftNumbers[0]);
+                    if (i == 0) goldCntImageViews.add(temp);
+                    if (i == 1) bombCntImageViews.add(temp);
+
+                    group.getChildren().add(temp);
+                }
 
                 if (i == 1 && j >= 4 && j <= 11)
                     group.getChildren().add(new ImageView(twoHearts));
@@ -119,5 +131,66 @@ public class InterfaceBar {
             }
         }
         App.root.getChildren().add(InterfaceBar.grid);
+    }
+
+    public static void updateBombCounter(int newCnt){
+        for (ImageView imageView : bombCntImageViews)
+            nodes[1][19].getChildren().remove(imageView);
+        bombCntImageViews.clear();
+
+        ImageView temp;
+        if (newCnt < 10)
+            temp = new ImageView(leftNumbers[newCnt]);
+        else{
+            temp = new ImageView(rightNumbers[newCnt % 10]);
+            nodes[1][19].getChildren().add(temp);
+            bombCntImageViews.add(temp);
+
+            temp = new ImageView(leftNumbers[newCnt / 10]);
+        }
+        nodes[1][19].getChildren().add(temp);
+        bombCntImageViews.add(temp);
+    }
+
+    public static void updateGoldCounter(int newCnt){
+        for (ImageView imageView : goldCntImageViews)
+            nodes[0][19].getChildren().remove(imageView);
+        goldCntImageViews.clear();
+
+        ImageView temp;
+        if (newCnt < 10)
+            temp = new ImageView(leftNumbers[newCnt]);
+        else{
+            temp = new ImageView(rightNumbers[newCnt % 10]);
+            nodes[0][19].getChildren().add(temp);
+            goldCntImageViews.add(temp);
+
+            temp = new ImageView(leftNumbers[newCnt / 10]);
+        }
+        nodes[0][19].getChildren().add(temp);
+        goldCntImageViews.add(temp);
+    }
+
+    public static void updateHealthPotionCounter(int newCnt){
+        for (ImageView imageView : healthPotionCntImageViews)
+            nodes[0][16].getChildren().remove(imageView);
+        healthPotionCntImageViews.clear();
+
+        ImageView temp;
+        if (newCnt < 10)
+            temp = new ImageView(leftNumbers[newCnt]);
+        else{
+            temp = new ImageView(rightNumbers[newCnt % 10]);
+            nodes[0][16].getChildren().add(temp);
+            healthPotionCntImageViews.add(temp);
+
+            temp = new ImageView(leftNumbers[newCnt / 10]);
+        }
+        nodes[0][16].getChildren().add(temp);
+        healthPotionCntImageViews.add(temp);
+    }
+
+    public static void regenerateOneHeart(){
+
     }
 }

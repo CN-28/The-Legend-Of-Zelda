@@ -7,6 +7,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 
+import static MapsElements.MoveDirection.*;
+
 public class Manhandla extends Creature {
     private static final Image[] images = new Image[9];
     private final ImageView[] imageViews = new ImageView[9];
@@ -76,21 +78,25 @@ public class Manhandla extends Creature {
         int y = NorthWestMap.boss.position.getY(); int x = NorthWestMap.boss.position.getX();
         if (this.topHealth <= 0 && this.topAlive){
             this.topAlive = false;
+            dropLoot(map, this.getPosition().add(NORTH.toUnitVector()));
             map.nodes[y - 1][x].getChildren().remove(getCreatureAnimation()[1]);
             map.nodes[y - 1][x].getChildren().remove(getCreatureAnimation()[5]);
         }
         else if (this.rightHealth <= 0 && this.rightAlive){
             this.rightAlive = false;
+            dropLoot(map, this.getPosition().add(EAST.toUnitVector()));
             map.nodes[y][x + 1].getChildren().remove(getCreatureAnimation()[2]);
             map.nodes[y][x + 1].getChildren().remove(getCreatureAnimation()[6]);
         }
         else if (this.botHealth <= 0 && this.botAlive){
             this.botAlive = false;
+            dropLoot(map, this.getPosition().add(SOUTH.toUnitVector()));
             map.nodes[y + 1][x].getChildren().remove(getCreatureAnimation()[3]);
             map.nodes[y + 1][x].getChildren().remove(getCreatureAnimation()[7]);
         }
         else if (this.leftHealth <= 0 && this.leftAlive){
             this.leftAlive = false;
+            dropLoot(map, this.position.add(WEST.toUnitVector()));
             map.nodes[y][x - 1].getChildren().remove(getCreatureAnimation()[4]);
             map.nodes[y][x - 1].getChildren().remove(getCreatureAnimation()[8]);
         }

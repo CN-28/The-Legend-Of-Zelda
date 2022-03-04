@@ -37,7 +37,6 @@ public class App extends Application implements IMapChangeObserver {
         }
     }
     private static Creature mob;
-    protected static int attackPower = 1;
     protected static Vector2d moveVector;
     private static boolean isRunning = false;
 
@@ -115,6 +114,7 @@ public class App extends Application implements IMapChangeObserver {
                     else{
                         map.nodes[swordPos.getY()][swordPos.getX()].getChildren().remove(hero.getSwordPicture(swordDir));
                         Vector2d newPos = swordPos.add(moveVector);
+
                         if (newPos.follows(AbstractMap.lowerLeft) && newPos.precedes(AbstractMap.upperRight) && !map.isOccupied(newPos) && !handleBossAttackDamage(swordPos, swordPos)
                         && !handleAttackDamageToNormalCreature(swordPos, swordPos)){
                             swordPos = newPos;
@@ -136,7 +136,7 @@ public class App extends Application implements IMapChangeObserver {
                     else
                         mob = App.map.mobs.get(swordPos.getY()).get(swordPos.getX()).get(App.map.mobs.get(swordPos.getY()).get(swordPos.getX()).size() - 1);
 
-                    mob.removeHealth(App.map, attackPower);
+                    mob.removeHealth(App.map, hero.attackDamage);
                     return true;
                 }
                 return false;
@@ -144,10 +144,8 @@ public class App extends Application implements IMapChangeObserver {
 
             private boolean handleBossAttackDamage(Vector2d heroPos, Vector2d swordPos){
                 if (map instanceof NorthWestMap && NorthWestMap.boss != null){
-                    collidesWithBoss(heroPos, 1);
-                    if (NorthWestMap.boss != null)
-                        collidesWithBoss(swordPos, 1);
-                    return true;
+                    if (collidesWithBoss(heroPos, hero.attackDamage)) return true;
+                    return NorthWestMap.boss != null && collidesWithBoss(swordPos, hero.attackDamage);
                 }
                 return false;
             }
@@ -351,14 +349,19 @@ public class App extends Application implements IMapChangeObserver {
                             renderAttackAnimation();
                     }
                     case B ->{
-                        if (!bombAnimationRunning)
+                        if (!bombAnimationRunning && AbstractMap.hero.bombCnt > 0)
                             renderBombAnimation();
                     }
-                    case H -> useHealthPostion();
+                    case H -> {
+                        if (AbstractMap.hero.healthPotionCnt > 0)
+                            useHealthPostion();
+                    }
                 }
                 ke.consume();
-                if (!Hero.hasWoodenSword && !Hero.hasWhiteSword && App.map instanceof StartingCave && AbstractMap.hero.getPosition().equals(StartingCave.woodenSwordPosition))
-                    StartingCave.doPickUpAnimation();
+                if (!Hero.hasWoodenSword && !Hero.hasWhiteSword && App.map instanceof StartingCave cave && AbstractMap.hero.getPosition().equals(StartingCave.woodenSwordPosition))
+                    cave.doPickUpAnimation();
+                if (!EastSecretCave.itemsPickedUp && App.map instanceof EastSecretCave cave && (AbstractMap.hero.getPosition().equals(cave.leftItemPos) || AbstractMap.hero.getPosition().equals(cave.rightItemPos)))
+                    cave.doPickUpAnimation();
             }
         });
     }
@@ -370,16 +373,25 @@ public class App extends Application implements IMapChangeObserver {
         hero.pickUpItems(map);
     }
 
-    private void collidesWithBoss(Vector2d position, int attackPower){
+    private boolean collidesWithBoss(Vector2d position, int attackPower){
         Vector2d bossPos = NorthWestMap.boss.getPosition();
-        if (position.equals(bossPos.add(WEST.toUnitVector())))
+        if (position.equals(bossPos.add(WEST.toUnitVector()))){
             NorthWestMap.boss.removeHealth(attackPower, "left");
-        else if (position.equals(bossPos.add(EAST.toUnitVector())))
+            return true;
+        }
+        else if (position.equals(bossPos.add(EAST.toUnitVector()))){
             NorthWestMap.boss.removeHealth(attackPower, "right");
-        else if (position.equals(bossPos.add(NORTH.toUnitVector())))
+            return true;
+        }
+        else if (position.equals(bossPos.add(NORTH.toUnitVector()))){
             NorthWestMap.boss.removeHealth(attackPower, "top");
-        else if (position.equals(bossPos.add(SOUTH.toUnitVector())))
+            return true;
+        }
+        else if (position.equals(bossPos.add(SOUTH.toUnitVector()))){
             NorthWestMap.boss.removeHealth(attackPower, "bot");
+            return true;
+        }
+        return false;
     }
 
     public void renderAttackAnimation(){
@@ -397,10 +409,17 @@ public class App extends Application implements IMapChangeObserver {
         bombAnimationRunning = true;
         bombMap = App.map;
         bombAnimation.start();
+        AbstractMap.hero.bombCnt -= 1;
+        InterfaceBar.updateBombCounter(AbstractMap.hero.bombCnt);
     }
 
     public void useHealthPostion(){
-
+        if (AbstractMap.hero.getHealth() != Hero.maxHealth){
+            InterfaceBar.regenerateFullHp(AbstractMap.hero.getHealth());
+            AbstractMap.hero.setHealth(Hero.maxHealth);
+        }
+        AbstractMap.hero.healthPotionCnt -= 1;
+        InterfaceBar.updateHealthPotionCounter(AbstractMap.hero.healthPotionCnt);
     }
 
     public void renderHeroPic(){

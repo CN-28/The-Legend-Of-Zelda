@@ -116,8 +116,11 @@ public class NorthWestMap extends AbstractMap {
 
         if (boss.topAlive) this.nodes[y - 1][x].getChildren().add(boss.getCreatureAnimation()[1 + var]);
         if (boss.rightAlive) this.nodes[y][x + 1].getChildren().add(boss.getCreatureAnimation()[2 + var]);
+
         if (boss.botAlive) this.nodes[y + 1][x].getChildren().add(boss.getCreatureAnimation()[3 + var]);
+
         if (boss.leftAlive) this.nodes[y][x - 1].getChildren().add(boss.getCreatureAnimation()[4 + var]);
+
     }
 
     public void handleManhandlaMovement(){
@@ -139,19 +142,19 @@ public class NorthWestMap extends AbstractMap {
 
     public void handleManhandlaAttack(){
         if (boss != null){
-            if (!boss.leftAttacking){
+            if (!boss.leftAttacking && boss.leftAlive){
                 manhandlaAttackBalls.add(new ManhandlaAttackBall(boss.getPosition().add(WEST.toUnitVector()), AbstractMap.hero.getPosition(), WEST));
                 boss.leftAttacking = true;
             }
-            if (!boss.topAttacking){
+            if (!boss.topAttacking && boss.topAlive){
                 manhandlaAttackBalls.add(new ManhandlaAttackBall(boss.getPosition().add(NORTH.toUnitVector()), AbstractMap.hero.getPosition(), NORTH));
                 boss.topAttacking = true;
             }
-            if (!boss.rightAttacking){
+            if (!boss.rightAttacking && boss.rightAlive){
                 manhandlaAttackBalls.add(new ManhandlaAttackBall(boss.getPosition().add(EAST.toUnitVector()), AbstractMap.hero.getPosition(), EAST));
                 boss.rightAttacking = true;
             }
-            if (!boss.botAttacking){
+            if (!boss.botAttacking && boss.botAlive){
                 manhandlaAttackBalls.add(new ManhandlaAttackBall(boss.getPosition().add(SOUTH.toUnitVector()), AbstractMap.hero.getPosition(), SOUTH));
                 boss.botAttacking = true;
             }

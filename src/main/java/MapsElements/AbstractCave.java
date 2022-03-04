@@ -1,5 +1,7 @@
 package MapsElements;
 
+import GUI.App;
+import javafx.animation.AnimationTimer;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -11,11 +13,14 @@ import java.util.HashMap;
 
 public abstract class AbstractCave extends AbstractMap{
     protected Vector2d cavePosition;
+    public AnimationTimer pickUpAnimation;
+    public int frameCount;
     public static Image caveTile, fire, whiteSword;
     public static ImageView pickUpWeaponAnimation, pickUpItemAnimation, pickUpWhiteSwordAnimation;
     public ImageView oldMan, merchant;
     public static final ArrayList<Image> itemsToDraw = new ArrayList<>();
-    public final ArrayList<ImageView> itemsDrawn = new ArrayList<>();
+    public final HashMap<Vector2d, ImageView> itemsDrawn = new HashMap<>();
+    public final HashMap<Vector2d, Image> itemsDrawnImages = new HashMap<>();
     public static int drawIter;
     static {
         try {
@@ -56,7 +61,8 @@ public abstract class AbstractCave extends AbstractMap{
         else
             drawIter += 1;
 
-        itemsDrawn.add(picture);
+        itemsDrawnImages.put(new Vector2d(x, y), drawn);
+        itemsDrawn.put(new Vector2d(x, y), picture);
         this.nodes[y][x].getChildren().add(picture);
     }
 
@@ -79,6 +85,11 @@ public abstract class AbstractCave extends AbstractMap{
         caves.put("Starting", new StartingCave());
         caves.put("East", new EastSecretCave());
         caves.put("SouthWest", new SouthWestSecretCave());
+    }
+
+    public void doPickUpAnimation(){
+        App.animationRunning = true;
+        this.pickUpAnimation.start();
     }
 
     public Vector2d getPosition(){

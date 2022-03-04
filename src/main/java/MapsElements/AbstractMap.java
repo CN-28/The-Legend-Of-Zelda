@@ -182,7 +182,7 @@ public abstract class AbstractMap implements IWorldMap {
                             }
                             else {
                                 if(AbstractMap.collidesWithHero(tempPos) && App.map.equals(AbstractMap.maps.get(map)))
-                                    hero.removeHealth(App.map,1);
+                                    hero.removeHealth(App.map, 1);
 
                                 octorok.ballPushed = false;
                                 nodes[octorok.ball.ballPosition.getY()][octorok.ball.ballPosition.getX()].getChildren().remove(octorok.ball.getAttackBallImage());

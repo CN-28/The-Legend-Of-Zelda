@@ -12,9 +12,7 @@ import java.io.FileNotFoundException;
 public class StartingCave extends AbstractCave{
     public static ImageView woodenSword, pickUpWoodenSwordAnimation;
     public static final ImageView[] startingCaveString = new ImageView[19];
-    public static AnimationTimer pickUpAnimation;
     public static final Vector2d woodenSwordPosition = new Vector2d(15, 11);
-    public int frameCount;
     static {
         try {
             woodenSword = new ImageView(new Image(new FileInputStream("src/main/resources/woodenSword.png"), AbstractMap.size, AbstractMap.size, false, false));
@@ -98,10 +96,5 @@ public class StartingCave extends AbstractCave{
             MapChangeObserver.notifyMapChange(maps.get("Start"));
 
         return false;
-    }
-
-    public static void doPickUpAnimation(){
-        App.animationRunning = true;
-        pickUpAnimation.start();
     }
 }

@@ -7,19 +7,24 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import static MapsElements.MoveDirection.*;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 public class Hero extends Creature {
-    private static final HashMap<MoveDirection, ImageView[]> attackImageViews = new HashMap<>();
+    private static final HashMap<MoveDirection, ImageView[]> woodenAttackImageViews = new HashMap<>();
+    private static final HashMap<MoveDirection, ImageView[]> whiteAttackImageViews = new HashMap<>();
     private static final HashMap<MoveDirection, ImageView> basicImageViews = new HashMap<>();
     private static final HashMap<MoveDirection, ImageView> woodenSwordImageViews = new HashMap<>();
     private static final HashMap<MoveDirection, ImageView> whiteSwordImageViews = new HashMap<>();
     private static final Image[] bombImages = new Image[4];
-    public int bombCnt, healthPotionCnt, goldCnt;
+    public int bombCnt, healthPotionCnt, goldCnt, attackDamage;
     public static int maxHealth;
     public static boolean hasWoodenSword, hasWhiteSword;
     static {
-        attackImageViews.put(SOUTH, new ImageView[8]); attackImageViews.put(EAST, new ImageView[8]);
-        attackImageViews.put(WEST, new ImageView[8]); attackImageViews.put(NORTH, new ImageView[8]);
+        woodenAttackImageViews.put(SOUTH, new ImageView[8]); woodenAttackImageViews.put(EAST, new ImageView[8]);
+        woodenAttackImageViews.put(WEST, new ImageView[8]); woodenAttackImageViews.put(NORTH, new ImageView[8]);
+        whiteAttackImageViews.put(SOUTH, new ImageView[8]); whiteAttackImageViews.put(EAST, new ImageView[8]);
+        whiteAttackImageViews.put(WEST, new ImageView[8]); whiteAttackImageViews.put(NORTH, new ImageView[8]);
         try {
             bombImages[0] = new Image(new FileInputStream("src/main/resources/bomb.png"), size, size, false, false);
             bombImages[1] = new Image(new FileInputStream("src/main/resources/bombExplosion1.png"), size, size, false, false);
@@ -37,44 +42,49 @@ public class Hero extends Creature {
             basicImageViews.put(EAST, new ImageView(new Image(new FileInputStream("src/main/resources/rightHero.png"), size, size, false, false)));
             basicImageViews.put(WEST, new ImageView(new Image(new FileInputStream("src/main/resources/leftHero.png"), size, size, false, false)));
             basicImageViews.put(NORTH, new ImageView(new Image(new FileInputStream("src/main/resources/backHero.png"), size, size, false, false)));
-            attackImageViews.get(SOUTH)[0] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom1.png"), size, size, false, false));
-            attackImageViews.get(SOUTH)[2] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom2_1.png"), size, size, false, false));
-            attackImageViews.get(SOUTH)[3] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom2_2.png"), size, size, false, false));
-            attackImageViews.get(SOUTH)[4] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom3_1.png"), size, size, false, false));
-            attackImageViews.get(SOUTH)[5] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom3_2.png"), size, size, false, false));
-            attackImageViews.get(SOUTH)[6] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom4_1.png"), size, size, false, false));
-            attackImageViews.get(SOUTH)[7] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom4_2.png"), size, size, false, false));
-            attackImageViews.get(WEST)[0] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft1.png"), size, size, false, false));
-            attackImageViews.get(WEST)[2] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft2_1.png"), size, size, false, false));
-            attackImageViews.get(WEST)[3] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft2_2.png"), size, size, false, false));
-            attackImageViews.get(WEST)[4] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft3_1.png"), size, size, false, false));
-            attackImageViews.get(WEST)[5] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft3_2.png"), size, size, false, false));
-            attackImageViews.get(WEST)[6] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft4_1.png"), size, size, false, false));
-            attackImageViews.get(WEST)[7] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft4_2.png"), size, size, false, false));
-            attackImageViews.get(EAST)[0] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight1.png"), size, size, false, false));
-            attackImageViews.get(EAST)[2] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight2_1.png"), size, size, false, false));
-            attackImageViews.get(EAST)[3] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight2_2.png"), size, size, false, false));
-            attackImageViews.get(EAST)[4] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight3_1.png"), size, size, false, false));
-            attackImageViews.get(EAST)[5] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight3_2.png"), size, size, false, false));
-            attackImageViews.get(EAST)[6] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight4_1.png"), size, size, false, false));
-            attackImageViews.get(EAST)[7] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight4_2.png"), size, size, false, false));
-            attackImageViews.get(NORTH)[0] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp1.png"), size, size, false, false));
-            attackImageViews.get(NORTH)[2] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp2_1.png"), size, size, false, false));
-            attackImageViews.get(NORTH)[3] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp2_2.png"), size, size, false, false));
-            attackImageViews.get(NORTH)[4] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp3_1.png"), size, size, false, false));
-            attackImageViews.get(NORTH)[5] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp3_2.png"), size, size, false, false));
-            attackImageViews.get(NORTH)[6] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp4_1.png"), size, size, false, false));
-            attackImageViews.get(NORTH)[7] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp4_2.png"), size, size, false, false));
+
+            woodenAttackImageViews.get(SOUTH)[0] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom" + 1 + ".png"), size, size, false, false));
+            for (int i = 2; i <= 7; i++)
+                woodenAttackImageViews.get(SOUTH)[i] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom" + i + ".png"), size, size, false, false));
+
+            woodenAttackImageViews.get(WEST)[0] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft" + 1 + ".png"), size, size, false, false));
+            for (int i = 2; i <= 7; i++)
+                woodenAttackImageViews.get(WEST)[i] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft" + i + ".png"), size, size, false, false));
+
+            woodenAttackImageViews.get(EAST)[0] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight" + 1 + ".png"), size, size, false, false));
+            for (int i = 2; i <= 7; i++)
+                woodenAttackImageViews.get(EAST)[i] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight" + i + ".png"), size, size, false, false));
+
+            woodenAttackImageViews.get(NORTH)[0] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp" + 1 + ".png"), size, size, false, false));
+            for (int i = 2; i <= 7; i++)
+                woodenAttackImageViews.get(NORTH)[i] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp" + i + ".png"), size, size, false, false));
+
+            whiteAttackImageViews.get(SOUTH)[0] = new ImageView(new Image(new FileInputStream("src/main/resources/attackBottom" + 1 + ".png"), size, size, false, false));
+            for (int i = 2; i <= 7; i++)
+                whiteAttackImageViews.get(SOUTH)[i] = new ImageView(new Image(new FileInputStream("src/main/resources/whiteAttackBottom" + i + ".png"), size, size, false, false));
+
+            whiteAttackImageViews.get(NORTH)[0] = new ImageView(new Image(new FileInputStream("src/main/resources/attackUp" + 1 + ".png"), size, size, false, false));
+            for (int i = 2; i <= 7; i++)
+                whiteAttackImageViews.get(NORTH)[i] = new ImageView(new Image(new FileInputStream("src/main/resources/whiteAttackUp" + i + ".png"), size, size, false, false));
+
+            whiteAttackImageViews.get(WEST)[0] = new ImageView(new Image(new FileInputStream("src/main/resources/attackLeft" + 1 + ".png"), size, size, false, false));
+            for (int i = 2; i <= 7; i++)
+                whiteAttackImageViews.get(WEST)[i] = new ImageView(new Image(new FileInputStream("src/main/resources/whiteAttackLeft" + i + ".png"), size, size, false, false));
+
+            whiteAttackImageViews.get(EAST)[0] = new ImageView(new Image(new FileInputStream("src/main/resources/attackRight" + 1 + ".png"), size, size, false, false));
+            for (int i = 2; i <= 7; i++)
+                whiteAttackImageViews.get(EAST)[i] = new ImageView(new Image(new FileInputStream("src/main/resources/whiteAttackRight" + i + ".png"), size, size, false, false));
         } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
+        ex.printStackTrace();
         }
     }
 
     public Hero() {
         this.position = new Vector2d(14, 9);
-        this.health = 16;
+        this.health = 20;
         maxHealth = this.health;
         this.orientation = SOUTH;
+        this.attackDamage = 1;
     }
 
     public void move(AbstractMap map, MoveDirection direction){
@@ -103,8 +113,10 @@ public class Hero extends Creature {
                         healthPotionCnt += 1;
                         InterfaceBar.updateHealthPotionCounter(healthPotionCnt);
                     }
-                    else if (AbstractMap.heart.equals(image))
-                        InterfaceBar.regenerateOneHeart();
+                    else if (AbstractMap.heart.equals(image) && this.health < maxHealth && this.health >= 0){
+                        InterfaceBar.regenerateOneHeart(this.health);
+                        this.health = min(this.health + 2, maxHealth);
+                    }
 
                     map.nodes[this.position.getY()][this.position.getX()].getChildren().remove(imageView);
                 }
@@ -115,6 +127,10 @@ public class Hero extends Creature {
 
     public void setPosition(int x, int y) {
         this.position = new Vector2d(x, y);
+    }
+
+    public void setHealth(int newHP){
+        this.health = newHP;
     }
 
     public void setPositionAfterMapChange() {
@@ -144,12 +160,28 @@ public class Hero extends Creature {
         return null;
     }
 
+    public void removeHealth(AbstractMap map, int attackPower){
+        this.health = max(0, this.health - attackPower);
+        if (this.health >= 0)
+            InterfaceBar.updateHealthBar(this.health);
+        if (this.health <= 0)
+            removeCreature(map);
+    }
+
+    public void changeToWhiteSword(){
+        hasWoodenSword = false;
+        hasWhiteSword = true;
+        this.attackDamage = 2;
+    }
+
     public void removeCreature(AbstractMap map){
 
     }
 
     public ImageView getSwordPicture(MoveDirection dir){
-        return woodenSwordImageViews.get(dir);
+        if (hasWoodenSword)
+            return woodenSwordImageViews.get(dir);
+        return whiteSwordImageViews.get(dir);
     }
 
     public ImageView getPicture(){
@@ -161,6 +193,8 @@ public class Hero extends Creature {
     }
 
     public ImageView[] getAnimationAttack(){
-        return attackImageViews.get(this.orientation);
+        if (hasWoodenSword)
+            return woodenAttackImageViews.get(this.orientation);
+        return whiteAttackImageViews.get(this.orientation);
     }
 }

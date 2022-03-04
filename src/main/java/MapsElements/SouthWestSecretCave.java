@@ -1,5 +1,6 @@
 package MapsElements;
 
+import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -40,6 +41,12 @@ public class SouthWestSecretCave extends AbstractCave{
         addRandomItem(12, 11);
         addRandomItem(15, 11);
         addRandomItem(18, 11);
+
+        pickUpAnimation = new AnimationTimer() {
+            public void handle(long now) {
+
+            }
+        };
     }
 
     public boolean canMoveTo(Vector2d position){

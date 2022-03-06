@@ -78,10 +78,10 @@ public class NorthMap extends AbstractMap {
         animation = new AnimationTimer() {
             public void handle(long now){
                 if (frameCount % 3 == 0)
-                    handleGhiniPushBack("North");
+                    handleGhiniPushBack();
 
                 if (frameCount % 14 == 0){
-                    handleGhiniMovement("North");
+                    handleGhiniMovement();
                     frameCount = 0;
                 }
                 frameCount += 1;

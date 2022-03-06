@@ -28,6 +28,7 @@ public class ManhandlaAttackBall {
         this.attackBall = new ImageView(attackBallImage);
         this.direction = direction;
         this.startPos = startPos;
+        this.position = startPos;
         this.a = ((float) (startPos.getY() - endPos.getY())) / ((float) (startPos.getX() - endPos.getX()));
         this.b = startPos.getY() - this.a * ((float) startPos.getX());
         if (endPos.getX() < startPos.getX())
@@ -43,10 +44,8 @@ public class ManhandlaAttackBall {
     }
 
     public void updatePosition(int x){
-        if (this.position != null){
-            prevX = this.position.getX();
-            prevY = this.position.getY();
-        }
+        prevX = this.position.getX();
+        prevY = this.position.getY();
 
         if (x == prevX){
             if (this.startPos.getY() > this.position.getY())

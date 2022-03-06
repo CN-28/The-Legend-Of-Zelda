@@ -15,7 +15,7 @@ import static MapsElements.MoveDirection.*;
 public class EastSecretCave extends AbstractCave{
     public final ImageView[] EastCaveString = new ImageView[11];
     public Vector2d leftItemPos, rightItemPos;
-    public static boolean itemsPickedUp = false;
+    public static boolean itemsPickedUp;
 
     public EastSecretCave(){
         this.leftItemPos = new Vector2d(12, 10);
@@ -67,7 +67,6 @@ public class EastSecretCave extends AbstractCave{
                         isWhiteSword = true;
                     for (Vector2d pos : itemsDrawn.keySet())
                        App.map.nodes[pos.getY()][pos.getX()].getChildren().remove(itemsDrawn.get(pos));
-
 
                     if (isWhiteSword){
                         App.map.nodes[hero.getY()][hero.getX()].getChildren().add(pickUpWeaponAnimation);

@@ -3,6 +3,7 @@ package MapsElements;
 import GUI.App;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -161,11 +162,14 @@ public class Hero extends Creature {
     }
 
     public void removeHealth(AbstractMap map, int attackPower){
-        this.health = max(0, this.health - attackPower);
-        if (this.health >= 0)
-            InterfaceBar.updateHealthBar(this.health);
-        if (this.health <= 0)
-            removeCreature(map);
+        if (this.health >= 0){
+            this.health = max(0, this.health - attackPower);
+            if (this.health >= 0)
+                InterfaceBar.updateHealthBar(this.health);
+            if (this.health <= 0)
+                removeCreature(map);
+        }
+
     }
 
     public void changeToWhiteSword(){
@@ -175,7 +179,18 @@ public class Hero extends Creature {
     }
 
     public void removeCreature(AbstractMap map){
-
+        App.scene.setOnKeyPressed(event -> {});
+        AbstractMap.maps.get("East").animation.stop();
+        AbstractMap.maps.get("SouthEast").animation.stop();
+        AbstractMap.maps.get("North").animation.stop();
+        AbstractMap.maps.get("NorthEast").animation.stop();
+        AbstractMap.maps.get("South").animation.stop();
+        AbstractMap.maps.get("SouthWest").animation.stop();
+        AbstractMap.maps.get("West").animation.stop();
+        AbstractMap.maps.get("NorthWest").animation.stop();
+        App.gameLoop.stop();
+        App.root.getChildren().remove(map.grid);
+        App.root.getChildren().add(App.gameOver);
     }
 
     public ImageView getSwordPicture(MoveDirection dir){

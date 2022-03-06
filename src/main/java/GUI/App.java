@@ -7,30 +7,44 @@ import static MapsElements.MoveDirection.*;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Iterator;
 
 public class App extends Application implements IMapChangeObserver {
-    protected static Scene scene;
+    public static Scene scene;
     public static InterfaceBar interfaceBar = new InterfaceBar();
     public static AbstractMap map;
     public static final VBox root = new VBox();
     protected static ImageView[] attackViews;
     protected static ImageView[][] bombExplosionViews = new ImageView[3][5];
     protected static ImageView bombView = new ImageView(AbstractMap.bomb);
-    public static boolean animationRunning = false;
-    public static boolean bombAnimationRunning = false;
-    public static boolean throwAnimation = false;
+    public static boolean animationRunning, bombAnimationRunning, throwAnimation;
+    public boolean moveLeft, moveRight, moveUp, moveDown;
+    public boolean canDealDamage = true;
+    public boolean throwHit, normalHit;
     private static AbstractMap bombMap;
-    protected static int attackIter, frameCount, attackFrameCount, bombFrameCount, bombIter;
-    public static AnimationTimer attackAnimation, bombAnimation;
+    protected static int attackIter, attackFrameCount, bombFrameCount, bombIter;
+    public static AnimationTimer attackAnimation, bombAnimation, gameLoop;
+    long lastMoved, lastDealtDamage;
+    public static ImageView startScreen, gameOver, winScreen;
+    public static MoveDirection swordDirection;
     static {
         AbstractMap.getMapsReferences(new StartingMap());
         AbstractCave.getCavesReferences();
         map = AbstractMap.maps.get("Start");
+        try {
+            startScreen = new ImageView(new Image(new FileInputStream("src/main/resources/startScreen.png"), 1050, 770, false, false));
+            gameOver = new ImageView(new Image(new FileInputStream("src/main/resources/gameOver.png"), 1050, 770, false, false));
+            winScreen = new ImageView(new Image(new FileInputStream("src/main/resources/winScreen.png"), 1050, 770, false, false));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         for (int i = 0; i < 3; i++){
             for (int j = 0; j < 5; j++)
                 bombExplosionViews[i][j] = new ImageView(AbstractMap.hero.getBombImages()[i + 1]);
@@ -42,11 +56,8 @@ public class App extends Application implements IMapChangeObserver {
 
     public void init(){
         AbstractMap.addMapChangeObserver(this);
-        this.renderHeroPic();
-        interfaceBar.generateInterfaceBar();
-        root.getChildren().add(map.grid);
-        scene = new Scene(root);
-        this.setKeyAssignments(scene);
+        root.getChildren().add(startScreen);
+        scene = new Scene(root, 1049, 769);
     }
 
     public void start(Stage primaryStage) {
@@ -60,11 +71,29 @@ public class App extends Application implements IMapChangeObserver {
             private Vector2d swordPos;
             private MoveDirection swordDir;
             public void handle(long currTime){
-                if (attackFrameCount % 3 == 0){
+                throwHit = false;
+                checkSwordCollision();
+                if (!throwHit && attackFrameCount % 3 == 0){
                     doHandle();
                     attackFrameCount = 0;
                 }
                 attackFrameCount += 1;
+            }
+
+            private void checkSwordCollision(){
+                if (throwAnimation && attackIter == 0){
+                    if (handleBossAttackDamage(swordPos, swordPos) || handleAttackDamageToNormalCreature(swordPos, swordPos)){
+                        map.nodes[swordPos.getY()][swordPos.getX()].getChildren().remove(hero.getSwordPicture(swordDir));
+                        throwAnimation = false;
+                        throwHit = true;
+                        attackAnimation.stop();
+                    }
+                }
+                else if (animationRunning && !throwAnimation && !normalHit){
+                    if (handleAttackDamageToNormalCreature(hero.getPosition(), hero.getPosition().add(moveVector)) ||
+                        handleBossAttackDamage(hero.getPosition(), hero.getPosition().add(moveVector)))
+                        normalHit = true;
+                }
             }
 
             private void doHandle(){
@@ -86,15 +115,12 @@ public class App extends Application implements IMapChangeObserver {
 
 
                     if (attackIter >= attackViews.length){
-                        handleAttackDamageToNormalCreature(hero.getPosition(), hero.getPosition().add(moveVector));
-
-                        handleBossAttackDamage(hero.getPosition(), hero.getPosition().add(moveVector));
-
                         map.nodes[hero.getY()][hero.getX()].getChildren().remove(attackViews[attackIter - 2]);
                         if (inBorders())
                             map.nodes[hero.getY() + moveVector.getY()][hero.getX() + moveVector.getX()].getChildren().remove(attackViews[attackIter - 1]);
                         map.nodes[hero.getY()][hero.getX()].getChildren().add(hero.getPicture());
                         animationRunning = false;
+                        normalHit = false;
                         attackAnimation.stop();
                     }
                 }
@@ -115,8 +141,7 @@ public class App extends Application implements IMapChangeObserver {
                         map.nodes[swordPos.getY()][swordPos.getX()].getChildren().remove(hero.getSwordPicture(swordDir));
                         Vector2d newPos = swordPos.add(moveVector);
 
-                        if (newPos.follows(AbstractMap.lowerLeft) && newPos.precedes(AbstractMap.upperRight) && !map.isOccupied(newPos) && !handleBossAttackDamage(swordPos, swordPos)
-                        && !handleAttackDamageToNormalCreature(swordPos, swordPos)){
+                        if (newPos.follows(AbstractMap.lowerLeft) && newPos.precedes(AbstractMap.upperRight) && !map.isOccupied(newPos)){
                             swordPos = newPos;
                             map.nodes[swordPos.getY()][swordPos.getX()].getChildren().add(hero.getSwordPicture(swordDir));
                         }
@@ -305,7 +330,7 @@ public class App extends Application implements IMapChangeObserver {
             }
         };
 
-        AnimationTimer gameLoop = new AnimationTimer() {
+        gameLoop = new AnimationTimer() {
             public void handle(long currentNanoTime) {
                 if (!isRunning){
                     AbstractMap.maps.get("East").animation.start();
@@ -318,32 +343,90 @@ public class App extends Application implements IMapChangeObserver {
                     AbstractMap.maps.get("NorthWest").animation.start();
                     isRunning = true;
                 }
-                // dealing damage to hero to fast, need to be fixed!
-                if (frameCount % 8 == 0){
-                    if (map.mobCollidesWithHero())
-                        AbstractMap.hero.removeHealth(App.map, 1);
 
-                    frameCount = 0;
+                // check 5 times per second
+                if (currentNanoTime - lastDealtDamage >= 200_000_000)
+                    canDealDamage = true;
+
+                if (canDealDamage && map.mobCollidesWithHero()){
+                    AbstractMap.hero.removeHealth(map, 1);
+                    canDealDamage = false;
+                    lastDealtDamage = currentNanoTime;
                 }
 
-                frameCount += 1;
+                // check 24 times per second
+                if (currentNanoTime - lastMoved >= 41_666_667){
+                    if (!animationRunning) move();
+                    else {
+                        moveLeft = false; moveDown = false; moveUp = false; moveRight = false;
+                    }
+                    lastMoved = currentNanoTime;
+                }
+
             }
         };
-        gameLoop.start();
+
+        scene.setOnKeyPressed(event -> {
+            this.renderHeroPic();
+            root.getChildren().clear();
+            interfaceBar.generateInterfaceBar();
+            root.getChildren().add(map.grid);
+            this.setKeyAssignments(scene);
+            gameLoop.start();
+        });
     }
 
     public static void main(String[] args){
         launch(args);
     }
 
+    public void move(){
+        if (moveLeft) {
+            moveHero(AbstractMap.hero, WEST);
+            moveLeft = false;
+        }
+        else if (moveRight){
+            moveHero(AbstractMap.hero, EAST);
+            moveRight = false;
+        }
+        else if (moveUp){
+            moveHero(AbstractMap.hero, NORTH);
+            moveUp = false;
+        }
+        else if (moveDown){
+            moveHero(AbstractMap.hero, SOUTH);
+            moveDown = false;
+        }
+    }
+
     private void setKeyAssignments(Scene scene){
         scene.setOnKeyPressed(ke -> {
             if (!animationRunning){
                 switch (ke.getCode()) {
-                    case LEFT -> moveHero(AbstractMap.hero, WEST);
-                    case RIGHT -> moveHero(AbstractMap.hero, EAST);
-                    case DOWN -> moveHero(AbstractMap.hero, SOUTH);
-                    case UP -> moveHero(AbstractMap.hero, NORTH);
+                    case LEFT -> {
+                        moveLeft = true;
+                        moveRight = false;
+                        moveDown = false;
+                        moveUp = false;
+                    }
+                    case RIGHT -> {
+                        moveRight = true;
+                        moveLeft = false;
+                        moveDown = false;
+                        moveUp = false;
+                    }
+                    case DOWN -> {
+                        moveRight = false;
+                        moveLeft = false;
+                        moveUp = false;
+                        moveDown = true;
+                    }
+                    case UP -> {
+                        moveRight = false;
+                        moveLeft = false;
+                        moveDown = false;
+                        moveUp = true;
+                    }
                     case A -> {
                         if (!throwAnimation && (Hero.hasWoodenSword || Hero.hasWhiteSword))
                             renderAttackAnimation();
@@ -360,7 +443,9 @@ public class App extends Application implements IMapChangeObserver {
                 ke.consume();
                 if (!Hero.hasWoodenSword && !Hero.hasWhiteSword && App.map instanceof StartingCave cave && AbstractMap.hero.getPosition().equals(StartingCave.woodenSwordPosition))
                     cave.doPickUpAnimation();
-                if (!EastSecretCave.itemsPickedUp && App.map instanceof EastSecretCave cave && (AbstractMap.hero.getPosition().equals(cave.leftItemPos) || AbstractMap.hero.getPosition().equals(cave.rightItemPos)))
+                else if (!EastSecretCave.itemsPickedUp && App.map instanceof EastSecretCave cave && (AbstractMap.hero.getPosition().equals(cave.leftItemPos) || AbstractMap.hero.getPosition().equals(cave.rightItemPos)))
+                    cave.doPickUpAnimation();
+                else if (!SouthWestSecretCave.itemsBought && App.map instanceof SouthWestSecretCave cave && cave.isHeroOnItem() && cave.canGetItem())
                     cave.doPickUpAnimation();
             }
         });
@@ -395,6 +480,7 @@ public class App extends Application implements IMapChangeObserver {
     }
 
     public void renderAttackAnimation(){
+        swordDirection = AbstractMap.hero.getOrientation();
         attackIter = 0;
         attackViews = AbstractMap.hero.getAnimationAttack();
         map.nodes[AbstractMap.hero.getY()][AbstractMap.hero.getX()].getChildren().remove(AbstractMap.hero.getPicture());

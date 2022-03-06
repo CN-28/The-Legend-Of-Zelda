@@ -14,7 +14,10 @@ public class NorthWestMap extends AbstractMap {
     public static final Vector2d bottomLeftPassageBorder = new Vector2d(2 * width/5 + 1, height);
     public static final Vector2d bottomRightPassageBorder = new Vector2d(3 * width/5 - 2, height);
     public static Manhandla boss;
+    public AnimationTimer winAnimation;
     public static ArrayList<ManhandlaAttackBall> manhandlaAttackBalls = new ArrayList<>();
+    public boolean ballsPushed;
+    public int waitFrame, winFrame;
 
     public NorthWestMap(){
         for (int i = 0; i < height; i++){
@@ -43,21 +46,69 @@ public class NorthWestMap extends AbstractMap {
 
         animation = new AnimationTimer() {
             public void handle(long now) {
-
-                if (frameCount % 12 == 0 && App.map instanceof NorthWestMap)
-                    handleManhandlaAttack();
-
+                if (boss == null){
+                    App.scene.setOnKeyPressed(event -> {});
+                    AbstractMap.maps.get("East").animation.stop();
+                    AbstractMap.maps.get("SouthEast").animation.stop();
+                    AbstractMap.maps.get("North").animation.stop();
+                    AbstractMap.maps.get("NorthEast").animation.stop();
+                    AbstractMap.maps.get("South").animation.stop();
+                    AbstractMap.maps.get("SouthWest").animation.stop();
+                    AbstractMap.maps.get("West").animation.stop();
+                    AbstractMap.maps.get("NorthWest").animation.stop();
+                    App.gameLoop.stop();
+                    winAnimation.start();
+                }
+                checkManhandlaBallsCollision();
                 if (boss != null){
                     if (frameCount % 8 == 0 && frameCount != 48)
                         handleManhandlaAnimation();
-                    else if (frameCount == 48){
+                    else if (frameCount == 48)
                         handleManhandlaMovement();
-                        frameCount = 0;
-                    }
                 }
 
-                frameCount += 1;
+                if (frameCount != 0 && frameCount % 12 == 0 && App.map instanceof NorthWestMap)
+                    handleManhandlaAttack();
 
+                if (waitFrame == 300){
+                    ballsPushed = false;
+                    waitFrame = 0;
+                }
+
+                if (frameCount == 48) frameCount = 0;
+                if (ballsPushed) waitFrame += 1;
+                frameCount += 1;
+            }
+        };
+
+        winAnimation = new AnimationTimer() {
+            public void handle(long now) {
+                if (winFrame == 10){
+                    App.map.nodes[hero.getY()][hero.getX()].getChildren().remove(hero.getPicture());
+                    App.map.nodes[hero.getY()][hero.getX()].getChildren().add(StartingCave.pickUpWeaponAnimation);
+                    if (Hero.hasWhiteSword)
+                        App.map.nodes[hero.getY() - 1][hero.getX()].getChildren().add(AbstractCave.pickUpWhiteSwordAnimation);
+                    else
+                        App.map.nodes[hero.getY() - 1][hero.getX()].getChildren().add(StartingCave.pickUpWoodenSwordAnimation);
+
+                }
+                else if (winFrame == 200){
+                    App.scene.setOnKeyPressed(event -> {});
+                    AbstractMap.maps.get("East").animation.stop();
+                    AbstractMap.maps.get("SouthEast").animation.stop();
+                    AbstractMap.maps.get("North").animation.stop();
+                    AbstractMap.maps.get("NorthEast").animation.stop();
+                    AbstractMap.maps.get("South").animation.stop();
+                    AbstractMap.maps.get("SouthWest").animation.stop();
+                    AbstractMap.maps.get("West").animation.stop();
+                    AbstractMap.maps.get("NorthWest").animation.stop();
+                    App.gameLoop.stop();
+                    App.root.getChildren().remove(grid);
+                    App.root.getChildren().add(App.winScreen);
+
+                    winAnimation.stop();
+                }
+                winFrame += 1;
             }
         };
     }
@@ -139,9 +190,35 @@ public class NorthWestMap extends AbstractMap {
         boss.attackAnimation = !boss.attackAnimation;
     }
 
+    public void checkManhandlaBallsCollision(){
+        for (Iterator<ManhandlaAttackBall> iter = manhandlaAttackBalls.iterator(); iter.hasNext();){
+            ManhandlaAttackBall ball = iter.next();
+            if (collidesWithHero(ball.position)){
+                if (!heroBlockedBoss(ball.prevX, ball.prevY))
+                    hero.removeHealth(this, 1);
+
+                resetBossAttacks(ball.direction);
+
+                if (ball.prevY != -1)
+                    this.nodes[ball.prevY][ball.prevX].getChildren().remove(ball.getAttackBallImage());
+                iter.remove();
+            }
+        }
+    }
+
+    private void resetBossAttacks(MoveDirection direction){
+        if (boss != null) {
+            switch (direction) {
+                case WEST -> boss.leftAttacking = false;
+                case EAST -> boss.rightAttacking = false;
+                case SOUTH -> boss.botAttacking = false;
+                case NORTH -> boss.topAttacking = false;
+            }
+        }
+    }
 
     public void handleManhandlaAttack(){
-        if (boss != null){
+        if (boss != null && !ballsPushed){
             if (!boss.leftAttacking && boss.leftAlive){
                 manhandlaAttackBalls.add(new ManhandlaAttackBall(boss.getPosition().add(WEST.toUnitVector()), AbstractMap.hero.getPosition(), WEST));
                 boss.leftAttacking = true;
@@ -158,22 +235,15 @@ public class NorthWestMap extends AbstractMap {
                 manhandlaAttackBalls.add(new ManhandlaAttackBall(boss.getPosition().add(SOUTH.toUnitVector()), AbstractMap.hero.getPosition(), SOUTH));
                 boss.botAttacking = true;
             }
+            ballsPushed = true;
         }
 
         for (Iterator<ManhandlaAttackBall> iter = manhandlaAttackBalls.iterator(); iter.hasNext();){
             ManhandlaAttackBall ball = iter.next();
-            if (!(ball.position.precedes(upperRight) && ball.position.follows(lowerLeft)) || isOccupied(ball.position) || collidesWithHero(ball.position)){
-                if (collidesWithHero(ball.position))
-                    hero.removeHealth(this, 1);
+            if (!(ball.position.precedes(upperRight) && ball.position.follows(lowerLeft)) || isOccupied(ball.position)){
 
-                if (boss != null){
-                    switch (ball.direction){
-                        case WEST -> boss.leftAttacking = false;
-                        case EAST -> boss.rightAttacking = false;
-                        case SOUTH -> boss.botAttacking = false;
-                        case NORTH -> boss.topAttacking = false;
-                    }
-                }
+                resetBossAttacks(ball.direction);
+
                 if (ball.prevY != -1)
                     this.nodes[ball.prevY][ball.prevX].getChildren().remove(ball.getAttackBallImage());
                 iter.remove();
@@ -191,6 +261,13 @@ public class NorthWestMap extends AbstractMap {
                     ball.updatePosition(ball.position.getX());
             }
         }
+    }
+
+    private boolean heroBlockedBoss(int prevX, int prevY){
+        return prevX == hero.getX() && prevY < hero.getY() && hero.getOrientation() == NORTH ||
+               prevX == hero.getX() && prevY > hero.getY() && hero.getOrientation() == SOUTH ||
+               prevY == hero.getY() && prevX < hero.getX() && hero.getOrientation() == WEST ||
+               prevY == hero.getY() && prevX > hero.getX() && hero.getOrientation() == EAST;
     }
 
     public boolean canMoveTo(Vector2d position){

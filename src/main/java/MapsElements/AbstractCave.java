@@ -56,10 +56,8 @@ public abstract class AbstractCave extends AbstractMap{
         Image drawn = itemsToDraw.get(drawIter);
         ImageView picture = new ImageView(drawn);
 
-        if (drawn.equals(whiteSword))
-            itemsToDraw.remove(whiteSword);
-        else
-            drawIter += 1;
+        if (drawn.equals(whiteSword)) itemsToDraw.remove(whiteSword);
+        else drawIter += 1;
 
         itemsDrawnImages.put(new Vector2d(x, y), drawn);
         itemsDrawn.put(new Vector2d(x, y), picture);

@@ -65,22 +65,25 @@ public class NorthEastMap extends AbstractMap {
 
         animation = new AnimationTimer() {
             public void handle(long now) {
+                checkZolaBallCollision();
+                checkOctoroksBallsCollisions();
+
                 if (frameCount % 3 == 0)
-                    handleGhiniPushBack("NorthEast");
+                    handleGhiniPushBack();
 
                 if (frameCount % 6 == 0)
-                    handleOctorokBallsAttacks("NorthEast");
+                    handleOctorokBallsAttacks();
 
                 if (frameCount % 8 == 0){
-                    handleZolaAttack("NorthEast");
-                    handleOctorokMovement("NorthEast");
+                    handleZolaAttack();
+                    handleOctorokMovement();
                 }
 
                 if (frameCount % 14 == 0)
-                    handleGhiniMovement("NorthEast");
+                    handleGhiniMovement();
 
                 if (frameCount % 70 == 0)
-                    handleZolaMovement("NorthEast");
+                    handleZolaMovement();
 
                 if (frameCount == 168)
                     frameCount = 0;

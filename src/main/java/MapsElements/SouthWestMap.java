@@ -1,5 +1,6 @@
 package MapsElements;
 
+import GUI.App;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
@@ -46,17 +47,45 @@ public class SouthWestMap extends AbstractMap {
                 this.grid.add(this.nodes[i][j], j, i);
             }
         }
-        addGhini(20, 8, new MoveDirection[]{EAST, EAST, EAST, EAST, WEST, WEST, WEST, WEST});
+        addGhini(6, 3, new MoveDirection[]{EAST, EAST, EAST, EAST, WEST, WEST, WEST, WEST});
+        addGhini(6, 6, new MoveDirection[]{WEST, WEST, WEST, WEST, EAST, EAST, EAST, EAST});
+        addGhini(5, 8, new MoveDirection[]{EAST, EAST, EAST, EAST, WEST, WEST, WEST, WEST});
+        addGhini(5, 10, new MoveDirection[]{EAST, EAST, EAST, EAST, EAST, WEST, WEST, WEST, WEST, WEST});
+        addGhini(10, 12, new MoveDirection[]{WEST, WEST, WEST, WEST, EAST, EAST, EAST, EAST});
+        addOctorok(15, 11, new MoveDirection[]{EAST, EAST, EAST, EAST, EAST, EAST, NORTH, NORTH, NORTH, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST,
+                WEST, SOUTH, SOUTH, SOUTH, EAST, EAST, EAST, EAST, EAST});
+        addOctorok(16, 6, new MoveDirection[]{WEST, WEST, WEST, WEST, WEST, WEST, SOUTH, SOUTH, SOUTH, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST,
+                EAST, EAST, EAST, NORTH, NORTH, NORTH, WEST, WEST, WEST, WEST, WEST});
+        addOctorok(15, 9, new MoveDirection[]{EAST, EAST, EAST, EAST, EAST, EAST, NORTH, NORTH, NORTH, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST,
+                WEST, SOUTH, SOUTH, SOUTH, EAST, EAST, EAST, EAST, EAST});
+        addOctorok(16, 8, new MoveDirection[]{WEST, WEST, WEST, WEST, WEST, WEST, SOUTH, SOUTH, SOUTH, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST,
+                EAST, EAST, EAST, NORTH, NORTH, NORTH, WEST, WEST, WEST, WEST, WEST});
+        addTektite(10, 15, new MoveDirection[]{EAST, EAST, NORTH_WEST, NORTH_WEST, SOUTH, SOUTH});
+        addTektite(15, 17, new MoveDirection[]{NORTH_EAST, NORTH_EAST, SOUTH_EAST, SOUTH_EAST, NORTH_EAST, NORTH_EAST, SOUTH_WEST, SOUTH_WEST, NORTH_WEST, NORTH_WEST, SOUTH_WEST, SOUTH_WEST});
+        addTektite(24, 16, new MoveDirection[]{WEST, WEST, NORTH_EAST, NORTH_EAST, SOUTH, SOUTH});
 
         animation = new AnimationTimer() {
             public void handle(long now) {
-                if (frameCount % 3 == 0)
-                    handleGhiniPushBack("SouthWest");
+                if (App.map instanceof SouthWestMap)
+                    checkOctoroksBallsCollisions();
 
-                if (frameCount % 14 == 0){
-                    handleGhiniMovement("SouthWest");
+                if (frameCount % 3 == 0)
+                    handleGhiniPushBack();
+
+                if (frameCount % 6 == 0)
+                    handleOctorokBallsAttacks();
+
+                if (frameCount % 8 == 0)
+                    handleOctorokMovement();
+
+                if (frameCount % 12 == 0)
+                    handleTektiteMovement();
+
+                if (frameCount % 14 == 0)
+                    handleGhiniMovement();
+
+                if (frameCount == 168)
                     frameCount = 0;
-                }
                 frameCount += 1;
             }
         };

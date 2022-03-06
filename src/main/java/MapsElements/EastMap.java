@@ -1,6 +1,7 @@
 package MapsElements;
 
 
+import GUI.App;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
@@ -77,16 +78,21 @@ public class EastMap extends AbstractMap {
 
         animation = new AnimationTimer() {
             public void handle(long now) {
+                if (App.map instanceof EastMap){
+                    checkZolaBallCollision();
+                    checkOctoroksBallsCollisions();
+                }
+
                 if (frameCount % 6 == 0)
-                    handleOctorokBallsAttacks("East");
+                    handleOctorokBallsAttacks();
 
                 if (frameCount % 8 == 0){
-                    handleOctorokMovement("East");
-                    handleZolaAttack("East");
+                    handleOctorokMovement();
+                    handleZolaAttack();
                 }
 
                 if (frameCount % 70 == 0){
-                    handleZolaMovement("East");
+                    handleZolaMovement();
                     frameCount = 0;
                 }
 

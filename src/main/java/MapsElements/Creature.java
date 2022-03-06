@@ -20,13 +20,10 @@ public abstract class Creature {
     public static final ArrayList<Image> lootsToDraw = new ArrayList<>();
 
     public Creature(){
-        lootsToDraw.add(AbstractMap.bomb);
-        lootsToDraw.add(AbstractMap.heart);
-        lootsToDraw.add(AbstractMap.healthPotion);
-        lootsToDraw.add(AbstractMap.gold);
-        lootsToDraw.add(AbstractMap.gold);
-        lootsToDraw.add(AbstractMap.gold);
-        lootsToDraw.add(AbstractMap.gold);
+        for (int i = 0; i < 3; i++) lootsToDraw.add(AbstractMap.bomb);
+        for (int i = 0; i < 3; i++) lootsToDraw.add(AbstractMap.heart);
+        lootsToDraw.add(AbstractMap.healthPotion); lootsToDraw.add(AbstractMap.healthPotion);
+        for (int i = 0; i < 9; i++) lootsToDraw.add(AbstractMap.gold);
     }
 
     public void move(AbstractMap map, MoveDirection direction){
@@ -39,7 +36,7 @@ public abstract class Creature {
     }
 
     public void changeCreaturePosition(AbstractMap map, Vector2d newPos){
-        if (map.canMoveTo(newPos)){
+        if (newPos.precedes(AbstractMap.upperRight) && newPos.follows(AbstractMap.lowerLeft) && !map.isOccupied(newPos)){
             map.mobs.get(this.position.getY()).get(this.position.getX()).remove(this);
             if (!map.mobs.containsKey(newPos.getY()))
                 map.mobs.put(newPos.getY(), new LinkedHashMap<>());

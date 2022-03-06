@@ -1,5 +1,6 @@
 package MapsElements;
 
+import GUI.App;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
@@ -66,25 +67,43 @@ public class SouthMap extends AbstractMap {
 
         animation = new AnimationTimer() {
             public void handle(long now) {
+                if (App.map instanceof SouthMap)
+                    checkOctoroksBallsCollisions();
+
+                if (frameCount % 3 == 0)
+                    handleGhiniPushBack();
+
                 if (frameCount % 6 == 0)
-                    handleOctorokBallsAttacks("South");
+                    handleOctorokBallsAttacks();
 
                 if (frameCount % 8 == 0)
-                    handleOctorokMovement("South");
+                    handleOctorokMovement();
 
                 if (frameCount % 12 == 0)
-                    handleTektiteMovement("South");
+                    handleTektiteMovement();
 
-                if (frameCount == 96)
+                if (frameCount % 14 == 0)
+                    handleGhiniMovement();
+
+                if (frameCount == 168)
                     frameCount = 0;
 
                 frameCount += 1;
             }
         };
 
+        addOctorok(22, 5, new MoveDirection[]{SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH, SOUTH,
+                SOUTH, SOUTH, EAST, EAST, NORTH, NORTH, NORTH, NORTH, NORTH, NORTH, NORTH, NORTH, NORTH, NORTH, NORTH, NORTH, WEST, WEST});
+        addOctorok(17, 14, new MoveDirection[]{NORTH, NORTH, NORTH, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST,SOUTH, SOUTH,
+                SOUTH, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST});
+        addGhini(5, 7, new MoveDirection[]{WEST, WEST, WEST, WEST, EAST, EAST, EAST, EAST});
+        addGhini(6, 9, new MoveDirection[]{EAST, EAST, EAST, EAST, WEST, WEST, WEST, WEST});
+        addGhini(7, 11, new MoveDirection[]{WEST, WEST, WEST, WEST, EAST, EAST, EAST, EAST});
         addOctorok(10, 7, new MoveDirection[]{SOUTH, SOUTH, SOUTH, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST, EAST, NORTH, NORTH,
                 NORTH, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST, WEST});
         addTektite(15, 16, new MoveDirection[]{EAST, EAST, NORTH_WEST, NORTH_WEST, SOUTH, SOUTH});
+        addTektite(6, 15, new MoveDirection[]{EAST, EAST, NORTH_WEST, NORTH_WEST, SOUTH, SOUTH});
+        addTektite(11, 10, new MoveDirection[]{NORTH_EAST, NORTH_EAST, SOUTH_EAST, SOUTH_EAST, NORTH_EAST, NORTH_EAST, SOUTH_WEST, SOUTH_WEST, NORTH_WEST, NORTH_WEST, SOUTH_WEST, SOUTH_WEST});
     }
 
 

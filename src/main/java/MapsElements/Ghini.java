@@ -15,6 +15,7 @@ public class Ghini extends Creature {
     private final HashMap<MoveDirection, ImageView[]> imageViews = new HashMap<>();
     public boolean push = false;
     public int pushCnt = 4;
+    public MoveDirection pushDirection;
 
     static {
         try {

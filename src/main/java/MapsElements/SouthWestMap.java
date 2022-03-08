@@ -66,8 +66,10 @@ public class SouthWestMap extends AbstractMap {
 
         animation = new AnimationTimer() {
             public void handle(long now) {
-                if (App.map instanceof SouthWestMap)
+                if (App.map instanceof SouthWestMap){
+                    App.checkSwordCollision();
                     checkOctoroksBallsCollisions();
+                }
 
                 if (frameCount % 3 == 0)
                     handleGhiniPushBack();

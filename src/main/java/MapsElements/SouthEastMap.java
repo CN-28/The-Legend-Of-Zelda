@@ -64,8 +64,10 @@ public class SouthEastMap extends AbstractMap {
         animation = new AnimationTimer() {
 
             public void handle(long now) {
-                if (App.map instanceof SouthEastMap)
+                if (App.map instanceof SouthEastMap){
+                    App.checkSwordCollision();
                     checkZolaBallCollision();
+                }
 
                 if (frameCount % 8 == 0)
                     handleZolaAttack();

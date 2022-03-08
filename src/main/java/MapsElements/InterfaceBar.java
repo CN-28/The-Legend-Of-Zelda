@@ -276,8 +276,15 @@ public class InterfaceBar {
         if (health < Hero.maxHealth - 1){
             if (health == Hero.maxHealth - 2) regenerateFullHp(health);
             else updateHealthBar(health + 2);
-            nodes[1][5 + Hero.maxHealth / 4].getChildren().add(singleZeroHeart);
-            hpImageViews.add(singleZeroHeart);
+            if (Hero.maxHealth % 4 == 0){
+                nodes[1][5 + Hero.maxHealth / 4].getChildren().add(singleZeroHeart);
+                hpImageViews.add(singleZeroHeart);
+            }
+            else{
+                ImageView temp = new ImageView(emptyHeart);
+                nodes[1][5 + Hero.maxHealth / 4].getChildren().add(temp);
+                hpImageViews.add(temp);
+            }
         }
         else if (health == Hero.maxHealth - 1){
             nodes[1][5 + health / 4].getChildren().remove(hpImageViews.get(health / 4));
@@ -285,12 +292,26 @@ public class InterfaceBar {
             nodes[1][5 + health / 4].getChildren().add(imageView);
             hpImageViews.set(health / 4, imageView);
 
-            nodes[1][6 + health / 4].getChildren().add(singleHalfHeart);
-            hpImageViews.add(singleHalfHeart);
+            if (Hero.maxHealth % 4 == 0){
+                nodes[1][6 + health / 4].getChildren().add(singleHalfHeart);
+                hpImageViews.add(singleHalfHeart);
+            }
+            else{
+                ImageView temp = new ImageView(halfHeart);
+                nodes[1][6 + health / 4].getChildren().add(temp);
+                hpImageViews.add(temp);
+            }
         }
         else if (health == Hero.maxHealth){
-            nodes[1][5 + health / 4].getChildren().add(singleOneHeart);
-            hpImageViews.add(singleOneHeart);
+            if (Hero.maxHealth % 4 == 0){
+                nodes[1][5 + health / 4].getChildren().add(singleOneHeart);
+                hpImageViews.add(singleOneHeart);
+            }
+            else{
+                ImageView temp = new ImageView(twoHearts);
+                nodes[1][5 + health / 4].getChildren().add(temp);
+                hpImageViews.add(temp);
+            }
         }
     }
 }

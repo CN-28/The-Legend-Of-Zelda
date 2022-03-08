@@ -46,6 +46,9 @@ public class NorthWestMap extends AbstractMap {
 
         animation = new AnimationTimer() {
             public void handle(long now) {
+                if (App.map instanceof NorthWestMap)
+                    App.checkSwordCollision();
+
                 if (boss == null){
                     App.scene.setOnKeyPressed(event -> {});
                     AbstractMap.maps.get("East").animation.stop();

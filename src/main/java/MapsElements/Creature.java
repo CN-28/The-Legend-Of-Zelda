@@ -16,15 +16,8 @@ public abstract class Creature {
     public final ArrayList<MoveDirection> moveCycle = new ArrayList<>();
     protected static final int size = 35;
     public int i, prevX, prevY, randomNumber;
-    public ImageView prevImage;
+    public ImageView prevImage, newItem;
     public static final ArrayList<Image> lootsToDraw = new ArrayList<>();
-
-    public Creature(){
-        for (int i = 0; i < 3; i++) lootsToDraw.add(AbstractMap.bomb);
-        for (int i = 0; i < 3; i++) lootsToDraw.add(AbstractMap.heart);
-        lootsToDraw.add(AbstractMap.healthPotion); lootsToDraw.add(AbstractMap.healthPotion);
-        for (int i = 0; i < 9; i++) lootsToDraw.add(AbstractMap.gold);
-    }
 
     public void move(AbstractMap map, MoveDirection direction){
         if (direction == this.orientation){
@@ -68,14 +61,15 @@ public abstract class Creature {
 
     public void dropLoot(AbstractMap map, Vector2d position){
         randomNumber = ThreadLocalRandom.current().nextInt(0, lootsToDraw.size());
-        Image imageItem = lootsToDraw.get(randomNumber);
+
         if (!map.loots.containsKey(position))
             map.loots.put(position, new HashMap<>());
-        if (!map.loots.get(position).containsKey(imageItem))
-            map.loots.get(position).put(imageItem, new ArrayList<>());
-        ImageView newItem = new ImageView(imageItem);
-        map.loots.get(position).get(imageItem).add(newItem);
+        if (!map.loots.get(position).containsKey(lootsToDraw.get(randomNumber)))
+            map.loots.get(position).put(lootsToDraw.get(randomNumber), new ArrayList<>());
+
+        newItem = new ImageView(lootsToDraw.get(randomNumber));
         map.nodes[position.getY()][position.getX()].getChildren().add(newItem);
+        map.loots.get(position).get(lootsToDraw.get(randomNumber)).add(newItem);
     }
 
     public int getHealth(){

@@ -1,5 +1,6 @@
 package MapsElements;
 
+import GUI.App;
 import javafx.animation.AnimationTimer;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
@@ -77,6 +78,9 @@ public class NorthMap extends AbstractMap {
 
         animation = new AnimationTimer() {
             public void handle(long now){
+                if (App.map instanceof NorthMap)
+                    App.checkSwordCollision();
+
                 if (frameCount % 3 == 0)
                     handleGhiniPushBack();
 

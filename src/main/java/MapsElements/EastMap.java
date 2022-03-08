@@ -79,6 +79,7 @@ public class EastMap extends AbstractMap {
         animation = new AnimationTimer() {
             public void handle(long now) {
                 if (App.map instanceof EastMap){
+                    App.checkSwordCollision();
                     checkZolaBallCollision();
                     checkOctoroksBallsCollisions();
                 }

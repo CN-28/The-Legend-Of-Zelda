@@ -74,8 +74,10 @@ public class WestMap extends AbstractMap {
 
         animation = new AnimationTimer() {
             public void handle(long now) {
-                if (App.map instanceof WestMap)
+                if (App.map instanceof WestMap){
+                    App.checkSwordCollision();
                     checkOctoroksBallsCollisions();
+                }
 
                 if (frameCount % 3 == 0)
                     handleGhiniPushBack();

@@ -117,6 +117,11 @@ public abstract class AbstractMap implements IWorldMap {
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         }
+
+        for (int i = 0; i < 3; i++) Creature.lootsToDraw.add(bomb);
+        for (int i = 0; i < 3; i++) Creature.lootsToDraw.add(heart);
+        Creature.lootsToDraw.add(AbstractMap.healthPotion); Creature.lootsToDraw.add(healthPotion);
+        for (int i = 0; i < 9; i++) Creature.lootsToDraw.add(gold);
     }
 
     public boolean canMoveTo(Vector2d position){
@@ -466,6 +471,50 @@ public abstract class AbstractMap implements IWorldMap {
         }
 
         tektiteCnt += 1;
+    }
+
+    public boolean handleAttackDamageToNormalCreature(Vector2d heroPos, Vector2d swordPos){
+        if (mobs.containsKey(heroPos.getY()) && mobs.get(heroPos.getY()).containsKey(heroPos.getX()) && mobs.get(heroPos.getY()).get(heroPos.getX()).size() > 0
+            || mobs.containsKey(swordPos.getY()) && mobs.get(swordPos.getY()).containsKey(swordPos.getX()) && mobs.get(swordPos.getY()).get(swordPos.getX()).size() > 0){
+            Creature mob;
+            if (mobs.containsKey(heroPos.getY()) && mobs.get(heroPos.getY()).containsKey(heroPos.getX()) && mobs.get(heroPos.getY()).get(heroPos.getX()).size() > 0)
+                mob = mobs.get(heroPos.getY()).get(heroPos.getX()).get(mobs.get(heroPos.getY()).get(heroPos.getX()).size() - 1);
+            else
+                mob = mobs.get(swordPos.getY()).get(swordPos.getX()).get(mobs.get(swordPos.getY()).get(swordPos.getX()).size() - 1);
+
+            mob.removeHealth(this, hero.attackDamage);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean handleBossAttackDamage(Vector2d heroPos, Vector2d swordPos){
+        if (this instanceof NorthWestMap && NorthWestMap.boss != null){
+            if (collidesWithBoss(heroPos, hero.attackDamage)) return true;
+            return NorthWestMap.boss != null && collidesWithBoss(swordPos, hero.attackDamage);
+        }
+        return false;
+    }
+
+    public boolean collidesWithBoss(Vector2d position, int attackPower){
+        Vector2d bossPos = NorthWestMap.boss.getPosition();
+        if (position.equals(bossPos.add(WEST.toUnitVector()))){
+            NorthWestMap.boss.removeHealth(attackPower, "left");
+            return true;
+        }
+        else if (position.equals(bossPos.add(EAST.toUnitVector()))){
+            NorthWestMap.boss.removeHealth(attackPower, "right");
+            return true;
+        }
+        else if (position.equals(bossPos.add(NORTH.toUnitVector()))){
+            NorthWestMap.boss.removeHealth(attackPower, "top");
+            return true;
+        }
+        else if (position.equals(bossPos.add(SOUTH.toUnitVector()))){
+            NorthWestMap.boss.removeHealth(attackPower, "bot");
+            return true;
+        }
+        return false;
     }
 
     public static boolean collidesWithHero(Vector2d position){

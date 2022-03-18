@@ -13,7 +13,10 @@ The game based on The Legend of Zelda (NES) with 9 maps, 5 different types of mo
 
 # How to install
 
-# Tech stack
+# 👨‍💻 Tech Stack
+Project is created with:
+- **Java**
+- **JavaFX**
 
 # Resources
 Graphics was taken from - https://www.spriters-resource.com/nes/legendofzelda/
